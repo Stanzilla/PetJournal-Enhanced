@@ -4,10 +4,12 @@ local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
 local CONTINUED = L["Continued"]
 local INSTANCES = L["Instances"]
 
+-- GLOBALS: C_PetJournal
+
 function ZoneFiltering:OnInitialize()
-	
+
 	--self:FindNewPets()
-	self.ZoneGroupNames= {}	
+	self.ZoneGroupNames= {}
 	local continentsP6 = { GetMapContinents() };
 	local index = 0;
 	for i = 2, #continentsP6, 2 do
@@ -16,10 +18,10 @@ function ZoneFiltering:OnInitialize()
 	end
 	--self.ZoneGroupNames = {GetMapContinents()}
 	table.insert(self.ZoneGroupNames,INSTANCES)
-	
+
 	local ZoneToSpecies = {}
-	
-	
+
+
 	--create temporary mapping between zones and species to figure out which zones contain pets
 	local SpeciesToZoneId = zoneIDs.SpeciesToZoneId
 	for speciesID,zones in pairs(SpeciesToZoneId) do
@@ -27,7 +29,7 @@ function ZoneFiltering:OnInitialize()
 			if not ZoneToSpecies[zoneID] then ZoneToSpecies[zoneID] = true end
 		end
 	end
-	
+
 
 	--remove empty zones from zone groups
 	local zoneGroups = zoneIDs.continents
@@ -39,18 +41,18 @@ function ZoneFiltering:OnInitialize()
 			end
 		end
 	end
-	
-	
+
+
 	--create a way to store which zones are being filtered
 	self.zoneFilter = {}
-	
+
 	for zoneGroup = 1, #zoneGroups do
 		for zoneIndex = 1, #zoneGroups[zoneGroup] do
 			local zoneID = zoneGroups[zoneGroup][zoneIndex]
 			self.zoneFilter[zoneID] = true
 		end
 	end
-	
+
 	for i= 1 ,#self.ZoneGroupNames do
 		if #zoneIDs.continents[i] > 16 then
 			table.insert(self.ZoneGroupNames,i+1,self.ZoneGroupNames[i].." "..CONTINUED);
@@ -63,7 +65,7 @@ function ZoneFiltering:OnInitialize()
 			end
 		end
 	end
-	
+
 end
 
 function ZoneFiltering:GetNumZoneGroups()
@@ -84,7 +86,7 @@ function ZoneFiltering:GetZoneGroup(groupID)
 end
 
 function ZoneFiltering:GetZonesBySpeciesID(speciesID)
-	return zoneIDs.SpeciesToZoneId[speciesID] 
+	return zoneIDs.SpeciesToZoneId[speciesID]
 end
 
 function ZoneFiltering:SetFiltered(zoneID,enabled)
@@ -104,7 +106,7 @@ end
 function ZoneFiltering:SetAllGroupFiltered(groupID,enabled)
 	local zones = zoneIDs.continents[groupID]
 	if not zones then return end
-	
+
 	for i=1, #zones do
 		local zoneID = zones[i]
 		self.zoneFilter[zoneID]= enabled
@@ -115,8 +117,8 @@ end
 
 function ZoneFiltering:IsEveryZoneEnabled()
 	for k,v in pairs(self.zoneFilter) do
-		if not v then 
-			return false 
+		if not v then
+			return false
 		end
 	end
 	return true;
@@ -128,10 +130,10 @@ function ZoneFiltering:FindNewPets()
 	--zoneIDs.SpeciesToZoneId = {}
 	--MacroFrameText:SetMaxLetters(0)
 	self.newPets = ""
-	
+
 	local numPets = C_PetJournal.GetNumPets()
-	
-	zoneMap = {
+
+	local zoneMap = {
 		["stormwind"]=301,
 		["shattrath"]=481,
 		["brawl'gar arena"] = 321,
@@ -146,18 +148,18 @@ function ZoneFiltering:FindNewPets()
 		["valley of four winds"] = 807,
 		["coldarra"] = 486,
 	}
-	
+
 	for i=1, #zoneIDs.continents do
 		for j = 1, #zoneIDs.continents[i] do
 			zoneMap[string.lower(GetMapNameByID(zoneIDs.continents[i][j]))] = zoneIDs.continents[i][j]
 		end
 	end
-	
+
 	local keywords = {"cost","difficulty","faction","weather","season","time","event"}
-	
+
 	for i=1, numPets do
 		local _, speciesID, _, _, _, _, _, name, _, _, _, sourceText = C_PetJournal.GetPetInfoByIndex(i)
-	
+
 		if zoneIDs.SpeciesToZoneId[speciesID] == nil and (string.find(sourceText,"Pet Battle:",1,true) or string.find(sourceText,"Zone:",1,true) or string.find(sourceText,"Raid:",1,true) ) then
 			sourceText = string.lower(sourceText)
 			sourceText = string.gsub(sourceText,"|[rn]","")
@@ -165,14 +167,14 @@ function ZoneFiltering:FindNewPets()
 			local zoneText = string.match(sourceText,"zone:(.*)") or string.match(sourceText,"raid:(.*)") or string.match(sourceText,"drop:(.*)") or string.match(sourceText,"pet battle:(.*)")
 			if zoneText then
 				for x = 1, #keywords do
-					zoneText = string.gsub(zoneText,keywords[x]..":.*","") 
+					zoneText = string.gsub(zoneText,keywords[x]..":.*","")
 				end
 			end
-		
+
 			if zoneText then
-			
+
 				local zones = {string.split(",",zoneText)}
-				
+
 				local entry = "["..speciesID.."]={"
 				for j=1, #zones do
 					local zone = strtrim(zones[j])

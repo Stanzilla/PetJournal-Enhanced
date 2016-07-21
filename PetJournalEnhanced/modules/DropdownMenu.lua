@@ -1,13 +1,17 @@
 --partial class definition
 local DropDown = PetJournalEnhanced:NewModule("DropDown")
 local Config = PetJournalEnhanced:GetModule("Config")
-local Sorting = PetJournalEnhanced:GetModule("Sorting") 
+local Sorting = PetJournalEnhanced:GetModule("Sorting")
 local _
 local ASCENDING =  1
 local DESCENDING = 2
 local breedInfo = LibStub("LibPetBreedInfo-1.0")
 local ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
 local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
+
+-- GLOBALS: C_PetJournal LE_PET_JOURNAL_FILTER_NOT_COLLECTED LE_PET_JOURNAL_FILTER_COLLECTED PetJournalFilterDropDown
+-- GLOBALS: UIDropDownMenu_Initialize UIDropDownMenu_CreateInfo UIDropDownMenu_AddButton UIDROPDOWNMENU_MENU_VALUE
+-- GLOBALS: UIDropDownMenu_Refresh UIDropDownMenu_EnableButton UIDropDownMenu_DisableButton
 
 local FILTER_CURRENT_ZONE = L["Filter pets by current zone"]
 local FILTER_BREED = L["Breed"]
@@ -57,80 +61,80 @@ local function CreateDropdownMenu(self,level)
 	if level == 1 then
 		--create check boxes
 		local info = UIDropDownMenu_CreateInfo();
-		info.keepShownOnClick = true;	
+		info.keepShownOnClick = true;
 		info.text = COLLECTED
 		info.func = 	function(_, _, _, value)
-							C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_COLLECTED, value);
-							
+							C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_COLLECTED, value);
+
 							if (value) then
 								UIDropDownMenu_EnableButton(1,2);
 							else
 								UIDropDownMenu_DisableButton(1,2);
 							end;
 							Sorting:UpdatePets()
-							
-						end 
-		info.checked = not C_PetJournal.IsFlagFiltered(LE_PET_JOURNAL_FLAG_COLLECTED);
+
+						end
+		info.checked = C_PetJournal.IsFilterChecked(LE_PET_JOURNAL_FILTER_COLLECTED);
 		info.isNotRadio = true;
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		info.text = FAVORITES_FILTER
 		info.func = 	function(_, _, _, value)
 							Sorting.filtering.favoritesOnly = value
 							Sorting:UpdatePets()
-						end 
+						end
 		info.checked = Sorting.filtering.favoritesOnly
 		info.isNotRadio = true;
 		info.leftPadding = 16;
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		info.leftPadding = 0;
 		info.disabled = nil;
 
 		info.text = NOT_COLLECTED
 		info.func = 	function(_, _, _, value)
-							C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_NOT_COLLECTED, value);
+							C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED, value);
 							Sorting:UpdatePets()
-						end 
-		info.checked = not C_PetJournal.IsFlagFiltered(LE_PET_JOURNAL_FLAG_NOT_COLLECTED);
+						end
+		info.checked = C_PetJournal.IsFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED)
 		info.isNotRadio = true;
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		info.leftPadding = 0;
 		info.disabled = nil;
 
-		
-		
+
+
 		info.text = FILTER_CURRENT_ZONE
 		info.func = 	function(_, _, _, value)
-					
+
 					Sorting.filtering.currentZone = not Sorting.filtering.currentZone
 					Sorting:UpdatePets()
-				end 
+				end
 		info.checked = function() return Sorting.filtering.currentZone end
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		--create sub menu headers
 		info.checked = 	nil;
 		info.isNotRadio = nil;
 		info.func =  nil;
 		info.hasArrow = true;
 		info.notCheckable = true;
-	
+
 		info.text = PET_FAMILIES
 		info.value = 1;
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		info.text = SOURCES
 		info.value = 2;
 		UIDropDownMenu_AddButton(info, level)
-		
+
 		for i=1,#FILTER_MENU_NAMES do
 			info.text = FILTER_MENU_NAMES[i]
 			info.value = FILTER_MENU_VALUES[i];
-			UIDropDownMenu_AddButton(info, level)		
+			UIDropDownMenu_AddButton(info, level)
 		end
-		
+
 		if Config.display.breedInfo then
 			info.text = FILTER_BREED
 			info.value = 9;
@@ -139,9 +143,9 @@ local function CreateDropdownMenu(self,level)
 		info.text = FILTER_SORTING
 		info.value = 5
 		UIDropDownMenu_AddButton(info, level)
-		
-		
-		
+
+
+
 		local info = UIDropDownMenu_CreateInfo();
 		info.notCheckable = true
 		info.text = FILTER_RESET
@@ -150,16 +154,16 @@ local function CreateDropdownMenu(self,level)
 		UIDropDownMenu_AddButton(info, level)
 	end
 
-	if level == 2 then	
+	if level == 2 then
 		local info = UIDropDownMenu_CreateInfo();
-		info.keepShownOnClick = true;	
-		
+		info.keepShownOnClick = true;
+
 		if Config.display.breedInfo and UIDROPDOWNMENU_MENU_VALUE == 9 then --breed filter
-			
+
 			info.notCheckable = true;
 			info.text = CHECK_ALL
 			info.func = function()
-					for i=1,#Sorting.filtering.breed do 
+					for i=1,#Sorting.filtering.breed do
 						Sorting.filtering.breed[i] = true
 					end
 
@@ -167,10 +171,10 @@ local function CreateDropdownMenu(self,level)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-					for i=1,#Sorting.filtering.breed	do 
+					for i=1,#Sorting.filtering.breed	do
 						Sorting.filtering.breed[i] = false
 					end
 
@@ -178,10 +182,10 @@ local function CreateDropdownMenu(self,level)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
+
+
 			for i,breedName in breedInfo:IterateBreedNames() do
-				info.notCheckable = false;	
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -189,56 +193,56 @@ local function CreateDropdownMenu(self,level)
 				info.func = function(_, _, _, value)
 							Sorting.filtering.breed[i] = not Sorting.filtering.breed[i]
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.filtering.breed[i] end
 				UIDropDownMenu_AddButton(info, level)
-				
-			end	
+
+			end
 		elseif UIDROPDOWNMENU_MENU_VALUE == 11 then -- Level filter
-			
+
 			info.notCheckable = true;
 			info.text = CHECK_ALL
 			info.func = function()
-					for i=1,#Sorting.filtering.level	do 
+					for i=1,#Sorting.filtering.level	do
 						Sorting.filtering.level[i] = true
 					end
 					UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-							for i=1,#Sorting.filtering.level	do 
+							for i=1,#Sorting.filtering.level	do
 								Sorting.filtering.level[i] = false
 							end
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
-			info.notCheckable = false;	
+
+
+			info.notCheckable = false;
 			info.keepShownOnClick = true
 			info.checked = false
 			info.isNotRadio = true
-			
-			
+
+
 			for i=1,#levelBrackets do
 				info.text = levelBrackets[i]
 				info.func = 	function(_, _, _, value)
 									Sorting.filtering.level[i] = not Sorting.filtering.level[i]
 									Sorting:UpdatePets()
-								end 
+								end
 				info.checked = function() return Sorting.filtering.level[i] end;
 				info.isNotRadio = true;
 				UIDropDownMenu_AddButton(info, level)
 			end
-			
-			
-		
+
+
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 10 then -- misc filter
-			
+
 			info.notCheckable = true;
 			info.text = CHECK_ALL
 			info.func = function()
@@ -246,12 +250,12 @@ local function CreateDropdownMenu(self,level)
 					Sorting.filtering.cantBattle = true
 					Sorting.filtering.canTrade = true
 					Sorting.filtering.cantTrade = true
-					
+
 					UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
 					Sorting.filtering.canBattle = false
@@ -262,93 +266,93 @@ local function CreateDropdownMenu(self,level)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
-			info.notCheckable = false;	
+
+			info.notCheckable = false;
 			info.keepShownOnClick = true
 			info.checked = false
 			info.isNotRadio = true
-			
-			 
-			
+
+
+
 			info.text = FILTER_CAN_BATTLE
 			info.func = 	function(_, _, _, value)
 								Sorting.filtering.canBattle = not Sorting.filtering.canBattle
 								Sorting:UpdatePets()
-							end 
+							end
 			info.checked = function() return Sorting.filtering.canBattle end;
 			info.isNotRadio = true;
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = FILTER_CANT_BATTLE
 			info.func = 	function(_, _, _, value)
 								Sorting.filtering.cantBattle = not Sorting.filtering.cantBattle
 								Sorting:UpdatePets()
-							end 
+							end
 			info.checked = function() return Sorting.filtering.cantBattle end;
 			info.isNotRadio = true;
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = FILTER_CAN_TRADE
 			info.func = 	function(_, _, _, value)
-						
+
 						Sorting.filtering.canTrade = not Sorting.filtering.canTrade
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.filtering.canTrade end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = FILTER_CANT_TRADE
 			info.func = 	function(_, _, _, value)
-						
+
 						Sorting.filtering.cantTrade = not Sorting.filtering.cantTrade
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.filtering.cantTrade end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
+
+
 			info.text = FILTER_SHOW_HIDDEN
 			info.func = 	function(_, _, _, value)
 						Sorting.filtering.hiddenSpecies = not Sorting.filtering.hiddenSpecies
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.filtering.hiddenSpecies end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.notCheckable = true;
 			info.text = FILTER_RESET_HIDDEN
 			info.func = 	function(_, _, _, value)
 						Sorting:ResetSpeciesHidden()
 						Sorting:UpdatePets()
-					end 
+					end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 12 then -- ability type filter
-			
+
 			info.notCheckable = true;
 			info.text = CHECK_ALL
 			info.func = function()
-					for i=1,#Sorting.filtering.abilityType	do 
+					for i=1,#Sorting.filtering.abilityType	do
 						Sorting.filtering.abilityType[i] = true
 					end
 					UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-							for i=1,#Sorting.filtering.abilityType	do 
+							for i=1,#Sorting.filtering.abilityType	do
 								Sorting.filtering.abilityType[i] = false
 							end
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			for i=1, C_PetJournal.GetNumPetTypes() do
-				
-				info.notCheckable = false;	
+
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -356,37 +360,37 @@ local function CreateDropdownMenu(self,level)
 				info.func = function(_, _, _, value)
 							Sorting.filtering.abilityType[i] = not Sorting.filtering.abilityType[i]
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.filtering.abilityType[i] end
 				UIDropDownMenu_AddButton(info, level)
 			end
-			
-		
+
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 8 then --quantity
 			info.notCheckable = true;
 			info.text = CHECK_ALL
 			info.func = function()
-					for i=1,#Sorting.filtering.quantity	do 
+					for i=1,#Sorting.filtering.quantity	do
 						Sorting.filtering.quantity[i] = true
 					end
 					UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 					Sorting:UpdatePets()
 				end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-							for i=1,#Sorting.filtering.quantity	do 
+							for i=1,#Sorting.filtering.quantity	do
 								Sorting.filtering.quantity[i] = false
 							end
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
+
+
 			for i=1,#Sorting.filtering.quantity do
-				info.notCheckable = false;	
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -394,34 +398,34 @@ local function CreateDropdownMenu(self,level)
 				info.func = function(_, _, _, value)
 							Sorting.filtering.quantity[i] = not Sorting.filtering.quantity[i]
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.filtering.quantity[i] end
 				UIDropDownMenu_AddButton(info, level)
-			
+
 			end
-		
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 1 then --blizzard pet families
 			info.hasArrow = false;
 			info.isNotRadio = true;
 			info.notCheckable = true;
-				
-		
+
+
 			info.text = CHECK_ALL
 			info.func = function()
-							C_PetJournal.AddAllPetTypesFilter();
+							C_PetJournal.SetAllPetTypesChecked(true);
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2);
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-							C_PetJournal.ClearAllPetTypesFilter();
+							C_PetJournal.SetAllPetTypesChecked(false);
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2);
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-		
+
 			info.notCheckable = false;
 			local numTypes = C_PetJournal.GetNumPetTypes();
 			for i=1,numTypes do
@@ -430,43 +434,43 @@ local function CreateDropdownMenu(self,level)
 							C_PetJournal.SetPetTypeFilter(i, value);
 							Sorting:UpdatePets()
 						end
-				info.checked = function() return not C_PetJournal.IsPetTypeFiltered(i) end;
+				info.checked = function() return C_PetJournal.IsPetTypeChecked(i) end;
 				UIDropDownMenu_AddButton(info, level);
 			end
 		elseif UIDROPDOWNMENU_MENU_VALUE == 2 then --blizzard pet sources
 			info.hasArrow = false;
 			info.isNotRadio = true;
 			info.notCheckable = true;
-				
-		
+
+
 			info.text = CHECK_ALL
 			info.func = function()
-							C_PetJournal.AddAllPetSourcesFilter();
+							C_PetJournal.SetAllPetSourcesChecked(true);
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown, 2, 2);
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
-							C_PetJournal.ClearAllPetSourcesFilter();
+							C_PetJournal.SetAllPetSourcesChecked(false);
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown, 2, 2);
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-		
+
 			info.notCheckable = false;
 			local numSources = C_PetJournal.GetNumPetSources();
 			for i=1,numSources do
 				info.text = _G["BATTLE_PET_SOURCE_"..i];
 				info.func = function(_, _, _, value)
-							C_PetJournal.SetPetSourceFilter(i, value);
+							C_PetJournal.SetPetSourceChecked(i, value);
 							Sorting:UpdatePets()
 						end
-				info.checked = function() return not C_PetJournal.IsPetSourceFiltered(i) end;
+				info.checked = function() return C_PetJournal.IsPetSourceChecked(i) end;
 				UIDropDownMenu_AddButton(info, level);
 			end
-		
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 3 then --zone filter
 			local info = UIDropDownMenu_CreateInfo()
 			local zoneTree = ZoneFiltering:GetZoneGroupMapping()
@@ -482,7 +486,7 @@ local function CreateDropdownMenu(self,level)
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
 							ZoneFiltering:SetAllFiltered(false)
@@ -491,25 +495,25 @@ local function CreateDropdownMenu(self,level)
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			local info = UIDropDownMenu_CreateInfo()
-			info.notCheckable = false;	
+			info.notCheckable = false;
 			info.keepShownOnClick = true
 			info.checked = false
 			info.isNotRadio = true
-			info.text = FILTER_UNKNOWN_ZONE 
+			info.text = FILTER_UNKNOWN_ZONE
 			info.func = 	function(_, _, _, value)
 						Sorting.filtering.unknownZone = not Sorting.filtering.unknownZone
 						UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.filtering.unknownZone end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			local ZoneGroupMap = ZoneFiltering:GetZoneGroupMapping()
 			for i=1,ZoneFiltering:GetNumZoneGroups() do
 				info.hasArrow = true;
-				info.notCheckable = true;	
+				info.notCheckable = true;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -519,13 +523,13 @@ local function CreateDropdownMenu(self,level)
 				info.checked = nil
 				UIDropDownMenu_AddButton(info, level)
 			end
-			
-			
-			
-			
+
+
+
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 4 then --pet specialization
 			local info = UIDropDownMenu_CreateInfo()
-			
+
 			info.hasArrow = false;
 			info.isNotRadio = true;
 			info.notCheckable = true;
@@ -537,7 +541,7 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
 							for i=1,#Sorting.filtering.specialization do Sorting.filtering.specialization[i] = false end
@@ -545,10 +549,10 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
+
+
 			for i=1,4 do
-				info.notCheckable = false;	
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -557,13 +561,13 @@ local function CreateDropdownMenu(self,level)
 							Sorting.filtering.specialization[i] = not Sorting.filtering.specialization[i]
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
-							
-						end 
+
+						end
 				info.checked = function() return Sorting.filtering.specialization[i] end
 				UIDropDownMenu_AddButton(info, level)
-			
+
 			end
-		
+
 		elseif UIDROPDOWNMENU_MENU_VALUE == 5 then --sorting menu
 			info.keepShownOnClick = true
 			info.text = FILTER_SORT_FAVORITES
@@ -571,87 +575,87 @@ local function CreateDropdownMenu(self,level)
 						Sorting.sorting.favoritesFirst = not Sorting.sorting.favoritesFirst
 						UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.sorting.favoritesFirst end
 			info.isNotRadio = true
-			info.notCheckable = false		
-			
+			info.notCheckable = false
+
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.keepShownOnClick = true
 			info.text = FILTER_SORT_ORDER
 			info.func = nil;
-			info.notCheckable = true		
+			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
-			
-			info.notCheckable = false;	
-			
-			
-			
-			
-			
+
+			info.notCheckable = false;
+
+
+
+
+
 			--create sort menu options
-			for i=1,#sortTypes do 
+			for i=1,#sortTypes do
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = false
 				info.text = sortTypes[i]
 				info.func = 	function(_, _, _, value)
-							
+
 							Sorting.sorting.selection = i
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.sorting.selection == i end
 				UIDropDownMenu_AddButton(info, level)
 			end
-			
+
 			if Config.display.breedInfo then
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = false
 				info.text = FILTER_BREED
 				info.func = 	function(_, _, _, value)
-							
+
 							Sorting.sorting.selection = #sortTypes + 1
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.sorting.selection == #sortTypes + 1 end
 				UIDropDownMenu_AddButton(info, level)
-			end	
-			
+			end
+
 			info.keepShownOnClick = true
 			info.checked = false
 			info.isNotRadio = false
-			
+
 			info.text = FILTER_SORT_DIRECTION
 			info.func = nil;
-			info.notCheckable = true		
+			info.notCheckable = true
 			UIDropDownMenu_AddButton(info, level)
-			
-			info.notCheckable = false;	
+
+			info.notCheckable = false;
 			info.text = FILTER_SORT_ASCENDING
 			info.func = 	function(_, _, _, value)
-						
+
 						Sorting.sorting.order = ASCENDING
 						UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return Sorting.sorting.order ==  ASCENDING end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = FILTER_SORT_DESCENDING
 			info.func = 	function(_, _, _, value)
 						Sorting.sorting.order = DESCENDING
 						UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 						Sorting:UpdatePets()
-					end 
+					end
 			info.checked = function() return  Sorting.sorting.order == DESCENDING end
 			UIDropDownMenu_AddButton(info, level)
 		elseif UIDROPDOWNMENU_MENU_VALUE == 6 then
 			local info = UIDropDownMenu_CreateInfo()
-		
+
 			info.hasArrow = false;
 			info.isNotRadio = true;
 			info.notCheckable = true;
@@ -663,7 +667,7 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
 							for i=1,#Sorting.filtering.rarity do Sorting.filtering.rarity[i] = false end
@@ -671,10 +675,10 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			for i=1,4 do
 				local r,g,b,hex  = GetItemQualityColor(i-1)
-				info.notCheckable = false;	
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -683,7 +687,7 @@ local function CreateDropdownMenu(self,level)
 							Sorting.filtering.rarity[i] = not Sorting.filtering.rarity[i]
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return Sorting.filtering.rarity[i] end
 				UIDropDownMenu_AddButton(info, level)
 			end
@@ -693,7 +697,7 @@ local function CreateDropdownMenu(self,level)
 	if level == 3  then
 		if UIDROPDOWNMENU_MENU_VALUE >= 1 and UIDROPDOWNMENU_MENU_VALUE <= ZoneFiltering:GetNumZoneGroups() then
 			local info = UIDropDownMenu_CreateInfo()
-		
+
 			info.hasArrow = false;
 			info.isNotRadio = true;
 			info.notCheckable = true;
@@ -705,7 +709,7 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			info.text = UNCHECK_ALL
 			info.func = function()
 							ZoneFiltering:SetAllGroupFiltered(UIDROPDOWNMENU_MENU_VALUE,false)
@@ -713,13 +717,13 @@ local function CreateDropdownMenu(self,level)
 							Sorting:UpdatePets()
 						end
 			UIDropDownMenu_AddButton(info, level)
-			
-			
+
+
 			local zoneIDs = ZoneFiltering:GetZoneGroup(UIDROPDOWNMENU_MENU_VALUE)
 			for i=1, #zoneIDs do
 				local zoneID = zoneIDs[i]
 				info.hasArrow = false;
-				info.notCheckable = false;	
+				info.notCheckable = false;
 				info.keepShownOnClick = true
 				info.checked = false
 				info.isNotRadio = true
@@ -730,7 +734,7 @@ local function CreateDropdownMenu(self,level)
 							ZoneFiltering:SetFiltered(zoneID,not isEnabled)
 							UIDropDownMenu_Refresh(PetJournalFilterDropDown,1,2)
 							Sorting:UpdatePets()
-						end 
+						end
 				info.checked = function() return ZoneFiltering:GetFiltered(zoneID) end
 				UIDropDownMenu_AddButton(info, level)
 			end
@@ -742,11 +746,11 @@ local function PetOptionsMenu_Init(self, level)
 	local pet = DropDown.petOptionsMenu.pet
 	local info = UIDropDownMenu_CreateInfo();
 	info.notCheckable = true;
-	
+
 	local isRevoked = pet and pet.petID and C_PetJournal.PetIsRevoked(pet.petID);
 	local isLockedForConvert = pet and pet.petID and C_PetJournal.PetIsLockedForConvert(pet.petID);
-	
-	
+
+
 	if (pet and pet.petID and not isRevoked and not isLockedForConvert) then
 		info.text = BATTLE_PET_SUMMON;
 		if (pet.petID and C_PetJournal.GetSummonedPetGUID() == pet.petID) then
@@ -759,10 +763,10 @@ local function PetOptionsMenu_Init(self, level)
 		UIDropDownMenu_AddButton(info, level);
 		info.disabled = nil;
 	end
-	
+
 	if (pet and pet.petID and not isRevoked and not isLockedForConvert) then
 		info.text = BATTLE_PET_RENAME
-		info.func = 	function() StaticPopup_Show("BATTLE_PET_RENAME", nil, nil, pet.petID); end 
+		info.func = 	function() StaticPopup_Show("BATTLE_PET_RENAME", nil, nil, pet.petID); end
 		info.disabled = not C_PetJournal.IsJournalUnlocked();
 		UIDropDownMenu_AddButton(info, level);
 		info.disabled = nil;
@@ -772,30 +776,30 @@ local function PetOptionsMenu_Init(self, level)
 	if pet and pet.petID and (isFavorite or (not isRevoked and not isLockedForConvert)) then
 		if (isFavorite) then
 			info.text = BATTLE_PET_UNFAVORITE;
-			info.func = function() 
-				C_PetJournal.SetFavorite(pet.petID, 0); 
+			info.func = function()
+				C_PetJournal.SetFavorite(pet.petID, 0);
 			end
 		else
 			info.text = BATTLE_PET_FAVORITE;
-			info.func = function() 
-				C_PetJournal.SetFavorite(pet.petID, 1); 
+			info.func = function()
+				C_PetJournal.SetFavorite(pet.petID, 1);
 			end
 		end
 		info.disabled = not C_PetJournal.IsJournalUnlocked();
 		UIDropDownMenu_AddButton(info, level);
 		info.disabled = nil;
 	end
-	
+
 	if(pet and pet.petID and C_PetJournal.PetCanBeReleased(pet.petID)) then
 		info.text = BATTLE_PET_RELEASE;
 		info.func = function() StaticPopup_Show("BATTLE_PET_RELEASE", PetJournalUtil_GetDisplayName(pet.petID), nil, pet.petID); end
 		if (C_PetJournal.PetIsSlotted(pet.petID) or C_PetBattles.IsInBattle() or not C_PetJournal.IsJournalUnlocked()) then
 			info.disabled = true;
 		else
-			info.disabled = nil; 
+			info.disabled = nil;
 		end
 		UIDropDownMenu_AddButton(info, level);
-		info.disabled = nil; 
+		info.disabled = nil;
 	end
 
 	if(pet and pet.petID and pet.petID and C_PetJournal.PetIsTradable(pet.petID)) then
@@ -814,9 +818,9 @@ local function PetOptionsMenu_Init(self, level)
 		UIDropDownMenu_AddButton(info, level)
 		info.disabled = nil;
 	end
-	
+
 	if (pet and pet.speciesID) then
-		
+
 		local isSpciesHidden = Sorting:IsSpeciesHidden(pet.speciesID)
 		local hideSpeciesName = isSpciesHidden and SHOW or HIDE
 		info.text = hideSpeciesName;
@@ -827,7 +831,7 @@ local function PetOptionsMenu_Init(self, level)
 		info.disabled = nil;
 		UIDropDownMenu_AddButton(info, level)
 	end
-	
+
 	info.text = CANCEL
 	info.func = nil
 	UIDropDownMenu_AddButton(info, level)
@@ -835,7 +839,7 @@ end
 
 function DropDown:OnInitialize()
 	PetJournalFilterButton:Hide()
-	
+
 	self.menuFrame = CreateFrame("Frame","PetJournalEnhancedFilterDropDown",PetJournal,"UIDropDownMenuTemplate");
 	self.petOptionsMenu = CreateFrame("Frame","PetJournalEnhancedPetMenu",PetJournal,"UIDropDownMenuTemplate");
 	self.filterButton = CreateFrame("Button","PetJournalEnhancedFilterButton",PetJournal,"UIMenuButtonStretchTemplate");
@@ -846,4 +850,4 @@ function DropDown:OnInitialize()
 	UIDropDownMenu_Initialize(self.menuFrame, CreateDropdownMenu , "MENU")
 	UIDropDownMenu_Initialize(self.petOptionsMenu, PetOptionsMenu_Init , "MENU")
 	self.filterButton:SetScript("OnClick",function() PlaySound("igMainMenuOptionCheckBoxOn"); ToggleDropDownMenu(1, nil, self.menuFrame, "PetJournalEnhancedFilterButton", 74, 15); end)
-end	
+end

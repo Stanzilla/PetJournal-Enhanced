@@ -10,8 +10,9 @@ local ASCENDING =  1
 local DESCENDING = 2
 local USER = nil
 
+-- GLOBALS: C_PetJournal LE_PET_JOURNAL_FILTER_COLLECTED LE_PET_JOURNAL_FILTER_NOT_COLLECTED
 
-petMapping = {}
+local petMapping = {}
 
 local SetPet, GetPet
 do
@@ -30,22 +31,22 @@ do
 end
 
 local GetSortFunctions
-do 
+do
 
 	local function GetCompareFunc(var,func,direction)
 		return function(a,b)
 			local order = Sorting.db.global.sorting.order
-			local avar = a[var] 
+			local avar = a[var]
 			local bvar = b[var]
-			if type(avar) == "boolean" then 
+			if type(avar) == "boolean" then
 				avar = avar and 1 or 0
-				bvar = bvar and 1 or 0 
+				bvar = bvar and 1 or 0
 			end
-			
-			if avar == bvar and func then 
+
+			if avar == bvar and func then
 				return func(a,b)
 			end
-			
+
 			if direction then
 				if direction == ASCENDING then
 					return avar < bvar
@@ -80,12 +81,12 @@ do
 			ComposeSortFunction("isOwned",DESCENDING,"maxStat",USER,"level",DESCENDING,"name",ASCENDING),--specialization
 			ComposeSortFunction("isOwned",DESCENDING,"breed",USER,"level",DESCENDING,"name",ASCENDING),--specialization
 		}
-		
+
 	local sortFunctionsFavoritesFirst =  {}
 	for i=1,#sortFunctions do
 		sortFunctionsFavoritesFirst[i] = GetCompareFunc("favorite",   sortFunctions[i],  DESCENDING)
 	end
-	
+
 	function GetSortFunctions()
 		if Sorting.sorting.favoritesFirst then
 			return sortFunctionsFavoritesFirst
@@ -100,7 +101,7 @@ end
 function Sorting:OnInitialize()
 	self.ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
 	self.callbacks = LibStub("CallbackHandler-1.0"):New(self)
-	
+
 	local defaults = {
 		global = {
 			filtering = {
@@ -133,14 +134,14 @@ function Sorting:OnInitialize()
 	self.db.global.filtering.unknownZone = true --always reset to true
 	self.filtering = self.db.global.filtering
 	self.sorting = self.db.global.sorting
-	
+
 	--self:RegisterEvent("ZONE_CHANGED");
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PET_JOURNAL_PET_DELETED")
 
 	local LibPetJournal = LibStub("LibPetJournal-2.0")
 	LibPetJournal.RegisterCallback(self,"PostPetListUpdated", "ScanPets")
-	
+
 	PetJournalSearchBox:HookScript("OnTextChanged",function()  Sorting:SortPets() end)
 	hooksecurefunc(C_PetJournal,"SetFavorite",function() Sorting:UpdatePets() end)
 end
@@ -170,40 +171,40 @@ function Sorting:GetNumPets()
 end
 
 function Sorting:Reset()
-	C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_COLLECTED, true)
-	C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_NOT_COLLECTED, true);
-	C_PetJournal.AddAllPetTypesFilter();
-	C_PetJournal.AddAllPetSourcesFilter();
-	
+	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_COLLECTED, true)
+	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED, true);
+	C_PetJournal.SetAllPetTypesChecked();
+	C_PetJournal.SetAllPetSourcesChecked();
+
 	self.ZoneFiltering:SetAllFiltered(true)
-	
+
 	local filtering = self.db.global.filtering
 	local sorting = self.db.global.sorting
-	
+
 	for i=1,#filtering.rarity do
 		filtering.rarity[i] = true
 	end
-	
+
 	for i=1,#filtering.abilityType do
 		filtering.abilityType[i] = true
 	end
-	
+
 	for i=1,#filtering.level do
 		filtering.level[i] = true
 	end
-	
+
 	for i=1,#filtering.specialization do
 		filtering.specialization[i] = true
 	end
-	
+
 	for i=1,#filtering.quantity do
 		filtering.quantity[i] = true
 	end
-	
+
 	for i=1,#filtering.breed do
 		filtering.breed[i] = true
 	end
-	
+
 	filtering.currentZone = false
 	filtering.canBattle = true
 	filtering.cantBattle = true
@@ -215,7 +216,7 @@ function Sorting:Reset()
 	sorting.selection = 2
 	sorting.order = ASCENDING
 	sorting.favoritesFirst = false
-	
+
 	self:SortPets()
 end
 
@@ -224,7 +225,7 @@ function Sorting:ScanPets()
 end
 
 function Sorting:ZONE_CHANGED_NEW_AREA()
-	
+
 	if self.filtering.currentZone then
 		self:SortPets()
 	end
@@ -248,39 +249,39 @@ end
 do
 	--Return highest stat for a pet. Check constants for return values.
 	local function GetMaxStat(maxHealth,attack,speed)
-		
+
 		local maxHealth = tonumber(maxHealth)
 		local stamina = tonumber(math.floor((maxHealth -100)/5))
 		local attack = tonumber(attack)
 		local speed = tonumber(speed)
-		
-		if attack > speed and attack > stamina then 
-			return MAX_ATTACK 
-		elseif speed > attack and speed > stamina  then 
-			return MAX_SPEED 
-		elseif stamina > attack and stamina > speed  then 
-			return MAX_STAMINA 
+
+		if attack > speed and attack > stamina then
+			return MAX_ATTACK
+		elseif speed > attack and speed > stamina  then
+			return MAX_SPEED
+		elseif stamina > attack and stamina > speed  then
+			return MAX_STAMINA
 		end
 		return MAX_BALANCED
 	end
-	
+
 	local function CreatePet(petID,speciesID,isOwned,name,petType,canBattle,tradable,rarity,level,sourceText,maxHealth, attack, speed)
-		pet = {}
+		local pet = {}
 		pet.speciesID = speciesID
-		pet.petID = petID 
+		pet.petID = petID
 		pet.isOwned = isOwned
 		pet.name = name
 		pet.petType = petType
 		pet.canBattle = canBattle
 		pet.tradable = tradable
-		pet.rarity = rarity or 0				
+		pet.rarity = rarity or 0
 		pet.maxStat = 0
 		pet.abilityFilter = 0
 		pet.breed = 0
 		pet.breedConfidence = 0
 		pet.level = level or 0
 		pet.sourceText = sourceText
-		
+
 		if isOwned and canBattle and maxHealth and attack and speed then
 			pet.maxStat = GetMaxStat(maxHealth,attack,speed)
 			local breed, breedConfidence = BreedInfo:GetBreedByPetID(petID)
@@ -288,7 +289,7 @@ do
 				pet.breed, pet.breedConfidence = breed, breedConfidence
 			end
 		end
-		
+
 		if canBattle then
 			local abilityIDs = C_PetJournal.GetPetAbilityList(pet.speciesID);
 			for j=1, #abilityIDs do
@@ -302,13 +303,13 @@ do
 		end
 		return pet
 	end
-			
+
 	local function UpdatePet(pet, level, favorite, index,rarity)
 		pet.owned = C_PetJournal.GetNumCollectedInfo(pet.speciesID)
 		pet.favorite = favorite
 		pet.index = index
-				
-		
+
+
 		if pet.canBattle and pet.isOwned then
 			if pet.breedConfidence < BREED_HIGH_CONFIDENCE and level > pet.level then
 				local breed, breedConfidence = BreedInfo:GetBreedByPetID(petID)
@@ -323,41 +324,41 @@ do
 
 	function Sorting:SortPets()
 		--local start =  debugprofilestop()
-		
+
 		local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
-		
+
 		local ZoneFiltering = self.ZoneFiltering
-		
+
 		wipe(petMapping)
 
 		local activeFilters = self:GetActiveFilters()
-		
+
 		for i=1,numPets do
 			local petID, speciesID, isOwned, _, level, favorite, _, name, _, petType, _, sourceText, _, _, canBattle, tradable, _ = C_PetJournal.GetPetInfoByIndex(i, PetJournal.isWild)
 			local health, maxHealth, attack, speed, rarity
 			if petID then
 				 health, maxHealth, attack, speed, rarity = C_PetJournal.GetPetStats(petID)
 			end
-			
-			
+
+
 			local id = nil
-			if isOwned then id = petID else id = speciesID end 
+			if isOwned then id = petID else id = speciesID end
 			local pet = self:GetPet(id)
-			
+
 			if not pet then
-				
-				
+
+
 				pet = CreatePet(petID,speciesID,isOwned,name,petType,canBattle,tradable,rarity,level,sourceText,maxHealth, attack, speed)
-				
+
 				SetPet(pet)
 			end
-			
+
 			UpdatePet(pet,level,favorite,i,rarity)
-			
+
 			--filter pet
 			local exclude = false
 			for i=1, #activeFilters do
-				exclude = activeFilters[i]:exclude(pet) 
+				exclude = activeFilters[i]:exclude(pet)
 				if exclude then break end
 			end
 
@@ -365,20 +366,20 @@ do
 				table.insert(petMapping,pet)
 			end
 		end
-		
+
 		local sortFuncs =  GetSortFunctions()
 		local sortFunc = sortFuncs[self.sorting.selection]
 		table.sort(petMapping,sortFunc)
 		self.callbacks:Fire("PETS_SORTED")
-		
+
 		--local stop =  debugprofilestop() - start
 		--print(stop)
 	end
 	Sorting.UpdatePets = Sorting.SortPets
 end
-	
-	
-do 	
+
+
+do
 	local function BitwiseAndTable(tbl)
 		local truth = true;
 		for k,v in pairs(tbl) do
@@ -386,7 +387,7 @@ do
 		end
 		return truth
 	end
-	
+
 	local function InitializeFilters()
 
 		local filtering = Sorting.filtering
@@ -410,11 +411,11 @@ do
 			{--can battle
 				name = "favorites only",
 				enabled = function() return  filtering.favoritesOnly end,
-				exclude = function(self,pet)  
-					if pet.isOwned and not pet.favorite then 
+				exclude = function(self,pet)
+					if pet.isOwned and not pet.favorite then
 						return true end
 				 	return false
-				 end 
+				 end
 			},
 			{--cant battle
 				name = "cant battle",
@@ -450,9 +451,9 @@ do
 				name = "current zone",
 				initialize = function(self) self.currentZoneId =  GetCurrentMapAreaID() end,
 				enabled = function() return filtering.currentZone end,
-				exclude = function(self,pet) 
+				exclude = function(self,pet)
 					local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
-					return (zones == nil or not zones[self.currentZoneId]) 
+					return (zones == nil or not zones[self.currentZoneId])
 				end
 			},
 			{--unknown zone
@@ -468,26 +469,26 @@ do
 			--[[{--level-1
 				name = "level",
 				enabled = function() return not BitwiseAndTable(filtering.level) end,
-				exclude = function(self,pet) 
+				exclude = function(self,pet)
 					return pet.level and
-					(not filtering.level[1] and pet.level == 1) 					 or 
+					(not filtering.level[1] and pet.level == 1) 					 or
 					(not filtering.level[2] and pet.level <= 10 and pet.level >=  2) or
 					(not filtering.level[3] and pet.level <= 20 and pet.level >= 11) or
 					(not filtering.level[4] and pet.level <= 24 and pet.level >= 20) or
-					(not filtering.level[5] and pet.level == 25) 
+					(not filtering.level[5] and pet.level == 25)
 				 end
 			},]]
-			
+
 			{--ability filter
 				name = "ability",
 				abilityFilter = 0,
-				initialize = function(self)  
+				initialize = function(self)
 					self.abilityFilter = 0
 					for i=1,#filtering.abilityType do
 						if filtering.abilityType[i] then
 							self.abilityFilter = bit.bor(self.abilityFilter,2^i);
 						end
-					end 
+					end
 				end,
 				enabled = function() return not BitwiseAndTable(filtering.abilityType) end,
 				exclude = function(self,pet)  return  pet.canBattle and bit.band(self.abilityFilter,pet.abilityFilter) == 0  end
@@ -495,7 +496,7 @@ do
 			{ --zone filtering
 				name = "zone selection",
 				enabled = function() return not ZoneFiltering:IsEveryZoneEnabled() end,
-				exclude = function(self,pet) 
+				exclude = function(self,pet)
 					local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
 					if zones then
 						local filtered = false
@@ -510,26 +511,26 @@ do
 			{
 				name = "hidden species",
 				enabled = function() return not filtering.hiddenSpecies end,
-				exclude = function(self,pet) 
+				exclude = function(self,pet)
 					return Sorting:IsSpeciesHidden(pet.speciesID)
 				end
 			},
-			
+
 		}
-		
+
 		local levelRanges = {{1,1},{2,10},{11,20},{21,24},{25,25}}
 		for i=1,#levelRanges do
 			local filter = {
 				name = "level "..levelRanges[i][1].."-"..levelRanges[i][2],
 				enabled = function() return not filtering.level[i] end,
-				exclude = function(self,pet) 
+				exclude = function(self,pet)
 					return pet.level and pet.level >= levelRanges[i][1] and pet.level <=  levelRanges[i][2]
 				 end
 			}
 			table.insert(Sorting.filters,filter)
 		end
-		
-		
+
+
 	end
 
 	function Sorting:GetActiveFilters()
@@ -537,10 +538,10 @@ do
 		local activeFilters = {}
 		for i=1, #self.filters do
 			if self.filters[i].initialize then self.filters[i]:initialize() end
-			
-			if self.filters[i].enabled() then 
-				--print(self.filters[i].name or "Error: no filter name") 
-				table.insert(activeFilters,self.filters[i])	
+
+			if self.filters[i].enabled() then
+				--print(self.filters[i].name or "Error: no filter name")
+				table.insert(activeFilters,self.filters[i])
 			end
 		end
 		return activeFilters

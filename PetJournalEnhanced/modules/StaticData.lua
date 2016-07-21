@@ -134,7 +134,7 @@ zoneIDs.continents = {
 		811,--  Vale of Eternal Blossoms MoP
 		807,--  Valley of the Four Winds MoP
 	},
-	[7]={--Dreanor		
+	[7]={--Dreanor
 		978,--	Ashran
 		941,--	Frostfire Ridge
 		976,--	Frostwall
@@ -274,7 +274,7 @@ zoneIDs.continents = {
 
 
 
-zoneIDs.SpeciesToZoneId = { 
+zoneIDs.SpeciesToZoneId = {
 [724]={[809]=809},--Alpine Foxling
 [732]={[858]=858,[810]=810},--Amber Moth
 [1155]={[766]=766},--Anubisath Idol

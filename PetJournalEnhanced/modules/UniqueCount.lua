@@ -10,7 +10,7 @@ local UNIQUE_PETS = L["Unique Pets"]
 function UniquePets:ScanPets()
 	local pets = {}
 	local count = 0
-	for i,petID in LibPetJournal:IteratePetIDs() do 
+	for i,petID in LibPetJournal:IteratePetIDs() do
 		local speciesID = C_PetJournal.GetPetInfoByPetID(petID)
 		if speciesID and not pets[speciesID] then
 			count = count + 1
@@ -25,8 +25,8 @@ end
 function UniquePets:OnInitialize()
 	self.config = PetJournalEnhanced:GetModule("Config")
 	self.frame = CreateFrame("frame","PJEUniquePetCount",PetJournal,"InsetFrameTemplate3")
-	
-	
+
+
 	--Create unique pet count UI elements
 	local frame = self.frame;
 	frame:ClearAllPoints()
@@ -34,19 +34,19 @@ function UniquePets:OnInitialize()
 	frame:SetSize(130,18)
 	frame.staticText = frame:CreateFontString(nil,"ARTWORK","GameFontNormalSmall")
 	frame.uniqueCount = frame:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
-	
+
 	frame.staticText:ClearAllPoints()
 	frame.staticText:SetPoint("LEFT",frame,10,0)
 	--frame.staticText:SetPoint("RIGHT",frame.uniqueCount,"LEFT",-3,0)
 	frame.staticText:SetText(UNIQUE_PETS)
-	
+
 	frame.uniqueCount:ClearAllPoints()
 	frame.uniqueCount:SetPoint("RIGHT",frame,-10,0)
 	frame.uniqueCount:SetText("0")
-	
+
 	PetJournal:HookScript("OnShow",function() self:SetShown(Config.display.uniquePetCount) end )
-	
-	
+
+
 	--Inital ui state
 	LibPetJournal.RegisterCallback(self,"PetListUpdated", "ScanPets")
 	self:ScanPets()

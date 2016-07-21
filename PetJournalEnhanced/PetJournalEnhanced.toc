@@ -1,4 +1,4 @@
-## Interface: 60100 
+## Interface: 70000
 ## Title: PetJournal Enhanced
 ## Notes: Displays the rarity of the enemies pets in their tooltip.
 ## Author: nullberri
@@ -7,7 +7,7 @@
 ## LoadWith: Blizzard_Collections
 ## SavedVariables: PetJournalEnhancedDB
 ## X-Category: Pet Journal
-## X-Localizations: enUS,deDe,ruRU
+## X-Localizations: enUS, deDe, ruRU
 
 
 
