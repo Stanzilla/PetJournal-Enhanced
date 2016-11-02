@@ -1,7 +1,8 @@
 local zoneIDs = PetJournalEnhanced:NewModule("ZoneIDs")
 
 zoneIDs.continents = {
-	[1] = {--	Kalimdor
+	-- Kalimdor
+	[1] = {
 		772,--	Ahn'Qiraj: The Fallen Kingdom
 		894,--	Ammen Vale MoP
 		43,--	Ashenvale
@@ -37,7 +38,8 @@ zoneIDs.continents = {
 		889,--	Valley of Trials MoP
 		281,--	Winterspring
 	},
-	[2] = {--	Eastern Kingdoms
+	-- Eastern Kingdoms
+	[2] = {
 		614,--	Abyssal Depths
 		16,--	Arathi Highlands
 		17,--	Badlands
@@ -86,7 +88,8 @@ zoneIDs.continents = {
 		39,--	Westfall
 		40,--	Wetlands
 	},
-	[3]={--	Outland
+	--	Outland
+	[3] = {
 		475,--	Blade's Edge Mountains
 		465,--	Hellfire Peninsula
 		477,--	Nagrand
@@ -96,7 +99,8 @@ zoneIDs.continents = {
 		478,--	Terokkar Forest
 		467,--	Zangarmarsh
 	},
-	[4]={--	Northrend
+	--	Northrend
+	[4] = {
 		485,--	Northrend
 		486,--	Borean Tundra
 		510,--	Crystalsong Forest
@@ -111,14 +115,16 @@ zoneIDs.continents = {
 		501,--	Wintergrasp
 		496,--	Zul'Drak
 	},
-	[5]={--	The Maelstrom
+	--	The Maelstrom
+	[5] = {
 		640,--	Deepholm
 		605,--	Kezan
 		544,--	The Lost Isles
 		737,--	The Maelstrom
 		823,-- Darkmoon Island
 	},
-	[6]={-- Pandaria MoP
+	-- Pandaria (MoP)
+	[6] = {
 		858,--  Dread Wastes MoP
 		929,--  Isle of Giants MoP
 		928,--  Isle of Thunder MoP
@@ -134,7 +140,8 @@ zoneIDs.continents = {
 		811,--  Vale of Eternal Blossoms MoP
 		807,--  Valley of the Four Winds MoP
 	},
-	[7]={--Dreanor
+	-- Draenor
+	[7] = {
 		978,--	Ashran
 		941,--	Frostfire Ridge
 		976,--	Frostwall
@@ -149,7 +156,19 @@ zoneIDs.continents = {
 		970,--	Tanaan Jungle - Assault on the Dark Portal
 		1011,--	Warspear
 	},
-	[8]={--Instances
+	-- Broken Isles
+	[8] = {
+		1015, -- Aszuna
+		1021, -- Broken Shore
+		1014, -- Dalaran
+		1098, -- Eye of Azshara
+		1024, -- Highmountain
+		1017, -- Stormheim
+		1033, -- Suramar
+		1018, -- Val'sharah
+	},
+	-- Instances
+	[9] = {
 		930,--  Throne of Thunder MoP
 		401,--	Alterac Valley
 		461,--	Arathi Basin
