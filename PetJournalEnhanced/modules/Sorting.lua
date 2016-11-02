@@ -173,8 +173,8 @@ end
 function Sorting:Reset()
 	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_COLLECTED, true)
 	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED, true);
-	C_PetJournal.SetAllPetTypesChecked();
-	C_PetJournal.SetAllPetSourcesChecked();
+	C_PetJournal.SetAllPetTypesChecked(true);
+	C_PetJournal.SetAllPetSourcesChecked(true);
 
 	self.ZoneFiltering:SetAllFiltered(true)
 
