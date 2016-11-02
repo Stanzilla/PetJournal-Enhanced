@@ -151,7 +151,9 @@ function ZoneFiltering:FindNewPets()
 
 	for i=1, #zoneIDs.continents do
 		for j = 1, #zoneIDs.continents[i] do
-			zoneMap[string.lower(GetMapNameByID(zoneIDs.continents[i][j]))] = zoneIDs.continents[i][j]
+			if GetMapNameByID(zoneIDs.continents[i][j]) then
+				zoneMap[string.lower(GetMapNameByID(zoneIDs.continents[i][j]))] = zoneIDs.continents[i][j]
+			end
 		end
 	end
 
@@ -172,7 +174,6 @@ function ZoneFiltering:FindNewPets()
 			end
 
 			if zoneText then
-
 				local zones = {string.split(",",zoneText)}
 
 				local entry = "["..speciesID.."]={"
