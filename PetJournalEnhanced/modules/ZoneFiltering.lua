@@ -145,6 +145,13 @@ function ZoneFiltering:FindNewPets()
 		["coldarra"] = 486,
 		["garrison"] = 1116,
 		["erris the collector"] = 1116,
+		["dalaran sewers"] = 1014,
+		["kura thunderhoof"] = 1116,
+		["fishing shack"] = 1116,
+		["nagrand (draenor)"] = 950,
+		["shadowmoon valley (draenor)"] = 947,
+		["upper black rock spire"] = 995,
+		["orgrimmarvendor: historian llorezone: stormwind city"] = 301,
 	}
 
 	for i=1, #zoneIDs.continents do
@@ -155,7 +162,7 @@ function ZoneFiltering:FindNewPets()
 		end
 	end
 
-	local keywords = {"cost","difficulty","faction","weather","season","time","event"}
+	local keywords = {"cost", "difficulty", "faction", "weather", "season", "time", "event"}
 
 	for i=1, numPets do
 		local _, speciesID, _, _, _, _, _, name, _, _, _, sourceText = C_PetJournal.GetPetInfoByIndex(i)
@@ -172,7 +179,7 @@ function ZoneFiltering:FindNewPets()
 			end
 
 			if zoneText then
-				local zones = {string.split(",",zoneText)}
+				local zones = {string.split(",", zoneText)}
 
 				local entry = "["..speciesID.."]={"
 				for j=1, #zones do
@@ -181,9 +188,9 @@ function ZoneFiltering:FindNewPets()
 					local entryText = (zoneID or zone or "error")
 						entry = entry .. "["..entryText.."]="..entryText..","
 				end
-				entry = entry .. "}, --"..name.."|n"
+				entry = entry .. "}, -- "..name.."|n"
 				entry= entry.gsub(entry,",}","}")
-				if not string.find(self.newPets,entry,1,true) then
+				if not string.find(self.newPets, entry, 1, true) then
 					self.newPets = self.newPets .. entry
 				end
 			end
