@@ -1,10 +1,8 @@
 local UniquePets = PetJournalEnhanced:NewModule("UniquePets")
 local Config = PetJournalEnhanced:GetModule("Config")
 local LibPetJournal = LibStub("LibPetJournal-2.0")
-local _
 local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
 local UNIQUE_PETS = L["Unique Pets"]
-
 
 --Call back handler for updating unique pet count
 function UniquePets:ScanPets()
@@ -20,12 +18,9 @@ function UniquePets:ScanPets()
 	UniquePets.frame.uniqueCount:SetText(count)
 end
 
-
-
 function UniquePets:OnInitialize()
 	self.config = PetJournalEnhanced:GetModule("Config")
 	self.frame = CreateFrame("frame","PJEUniquePetCount",PetJournal,"InsetFrameTemplate3")
-
 
 	--Create unique pet count UI elements
 	local frame = self.frame;
@@ -65,12 +60,10 @@ function UniquePets:SetShown(enabled)
 	end
 end
 
-
 function UniquePets:GetDisplayUniquePetCount()
 	return self.db.global.display.uniquePetCount
 end
+
 function UniquePets:SetDisplayUniquePetCount(enabled)
 	self.db.global.display.uniquePetCount = enabled
 end
-
-

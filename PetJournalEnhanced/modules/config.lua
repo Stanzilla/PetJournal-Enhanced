@@ -95,7 +95,7 @@ function Config:OnInitialize()
 		},
 	}
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("PetJournalEnhanced", options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("PetJournalEnhanced","PetJournal Enhanced")
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("PetJournalEnhanced", "PetJournal Enhanced")
 end
 
 

@@ -17,7 +17,7 @@ function ZoneFiltering:OnInitialize()
 	 self.ZoneGroupNames[index] = continentsP6[i];
 	end
 	--self.ZoneGroupNames = {GetMapContinents()}
-	table.insert(self.ZoneGroupNames,INSTANCES)
+	table.insert(self.ZoneGroupNames, INSTANCES)
 
 	local ZoneToSpecies = {}
 
@@ -30,7 +30,6 @@ function ZoneFiltering:OnInitialize()
 		end
 	end
 
-
 	--remove empty zones from zone groups
 	local zoneGroups = zoneIDs.continents
 	for i=1, #zoneGroups do
@@ -41,7 +40,6 @@ function ZoneFiltering:OnInitialize()
 			end
 		end
 	end
-
 
 	--create a way to store which zones are being filtered
 	self.zoneFilter = {}
@@ -113,8 +111,6 @@ function ZoneFiltering:SetAllGroupFiltered(groupID,enabled)
 	end
 end
 
-
-
 function ZoneFiltering:IsEveryZoneEnabled()
 	for k,v in pairs(self.zoneFilter) do
 		if not v then
@@ -147,6 +143,8 @@ function ZoneFiltering:FindNewPets()
 		["caverns of time"]= 161,
 		["valley of four winds"] = 807,
 		["coldarra"] = 486,
+		["garrison"] = 1116,
+		["erris the collector"] = 1116,
 	}
 
 	for i=1, #zoneIDs.continents do
@@ -183,7 +181,7 @@ function ZoneFiltering:FindNewPets()
 					local entryText = (zoneID or zone or "error")
 						entry = entry .. "["..entryText.."]="..entryText..","
 				end
-				entry = entry .. "},--"..name.."|n"
+				entry = entry .. "}, --"..name.."|n"
 				entry= entry.gsub(entry,",}","}")
 				if not string.find(self.newPets,entry,1,true) then
 					self.newPets = self.newPets .. entry
@@ -198,5 +196,3 @@ function InsertNewPets()
 	MacroFrameText:SetMaxLetters(0)
 	MacroFrameText:Insert(ZoneFiltering.newPets)
 end
-
-

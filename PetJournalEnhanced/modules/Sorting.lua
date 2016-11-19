@@ -135,7 +135,6 @@ function Sorting:OnInitialize()
 	self.filtering = self.db.global.filtering
 	self.sorting = self.db.global.sorting
 
-	--self:RegisterEvent("ZONE_CHANGED");
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PET_JOURNAL_PET_DELETED")
 
@@ -225,18 +224,10 @@ function Sorting:ScanPets()
 end
 
 function Sorting:ZONE_CHANGED_NEW_AREA()
-
 	if self.filtering.currentZone then
 		self:SortPets()
 	end
 end
-
---[[function Sorting:ZONE_CHANGED()
-	print("zone changed")
-	if self.filtering.currentZone then
-		self:SortPets()
-	end
-end]]
 
 function Sorting:PETJOURNAL_ENHANCED_OPTIONS_UPDATE()
 	self:SortPets()
@@ -340,16 +331,12 @@ do
 				 health, maxHealth, attack, speed, rarity = C_PetJournal.GetPetStats(petID)
 			end
 
-
 			local id = nil
 			if isOwned then id = petID else id = speciesID end
 			local pet = self:GetPet(id)
 
 			if not pet then
-
-
 				pet = CreatePet(petID,speciesID,isOwned,name,petType,canBattle,tradable,rarity,level,sourceText,maxHealth, attack, speed)
-
 				SetPet(pet)
 			end
 
@@ -490,8 +477,12 @@ do
 						end
 					end
 				end,
-				enabled = function() return not BitwiseAndTable(filtering.abilityType) end,
-				exclude = function(self,pet)  return  pet.canBattle and bit.band(self.abilityFilter,pet.abilityFilter) == 0  end
+				enabled = function()
+					return not BitwiseAndTable(filtering.abilityType)
+				end,
+				exclude = function(self,pet)
+					return pet.canBattle and bit.band(self.abilityFilter,pet.abilityFilter) == 0
+				end,
 			},
 			{ --zone filtering
 				name = "zone selection",
@@ -529,15 +520,15 @@ do
 			}
 			table.insert(Sorting.filters,filter)
 		end
-
-
 	end
 
 	function Sorting:GetActiveFilters()
 		if not self.filters then InitializeFilters() end
 		local activeFilters = {}
 		for i=1, #self.filters do
-			if self.filters[i].initialize then self.filters[i]:initialize() end
+			if self.filters[i].initialize then
+				self.filters[i]:initialize()
+			end
 
 			if self.filters[i].enabled() then
 				--print(self.filters[i].name or "Error: no filter name")
@@ -548,8 +539,3 @@ do
 	end
 
 end
-
-
-
-
-

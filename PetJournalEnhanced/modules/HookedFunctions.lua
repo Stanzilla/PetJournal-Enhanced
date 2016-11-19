@@ -5,7 +5,7 @@ local MAX_SPEED = 2
 local MAX_STAMINA = 3
 local MAX_ATTACK = 4
 local _
-local PetList = PetJournalEnhanced:NewModule("PetList","AceEvent-3.0")
+local PetList = PetJournalEnhanced:NewModule("PetList", "AceEvent-3.0")
 local Config =  PetJournalEnhanced:GetModule("Config")
 local Sorting = PetJournalEnhanced:GetModule("Sorting")
 local DropDown = PetJournalEnhanced:GetModule("DropDown")
@@ -17,7 +17,6 @@ local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
 local rarityFormat = "|c%s%s|r"
 local AVAILABLE = "|n|cffffcc00"..L["Available"]..":"
 
-
 local function GetColor(confidence)
 	local color = "|cffffcc00"
 	if confidence < 2.5 then
@@ -25,8 +24,6 @@ local function GetColor(confidence)
 	end
 	return color
 end
-
-
 
 function PetList:Update()
 	self.PetJournal_FindPetCardIndex();
@@ -41,7 +38,6 @@ function PetList.PetJournal_HidePetDropdown()
 		HideDropDownMenu(1);
 	end
 end
-
 
 function PetList.PetJournalListItem_OnClick(self, button)
 	if ( IsModifiedClick("CHATLINK") ) then
@@ -67,7 +63,6 @@ function PetList.PetJournalListItem_OnClick(self, button)
 	end
 	PetList:Update()
 end
-
 
 function PetList.PetJournalDragButton_OnClick(self, button)
 	if ( IsModifiedClick("CHATLINK") ) then
@@ -127,28 +122,25 @@ function PetList:OnInitialize()
 	Sorting.RegisterCallback(self,"PETS_SORTED","Update")
 	Config.RegisterCallback(self,"PETJOURNAL_ENHANCED_OPTIONS_UPDATE")
 
-	--PetJournal:UnregisterAllEvents()
 	PetJournalListScrollFrame:Hide()
 	self.listScroll = CreateFrame("ScrollFrame","PetJournalEnhancedListScrollFrame",PetJournal,"HybridScrollFrameTemplate")
-	self.listScroll:SetPoint("TOPLEFT",PetJournal.LeftInset,3,-36);
-	self.listScroll:SetPoint("BOTTOMRIGHT",PetJournal.LeftInset,-2,5);
+	self.listScroll:SetPoint("TOPLEFT",PetJournal.LeftInset,3,-36)
+	self.listScroll:SetPoint("BOTTOMRIGHT",PetJournal.LeftInset,-2,5)
 
 	self:RegisterEvent("PET_JOURNAL_LIST_UPDATE","Update")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 
-
 	self.listScroll.scrollBar = CreateFrame("Slider","PetJournalEnhancedListScrollFrameScrollBar",self.listScroll,"HybridScrollBarTrimTemplate")
 	self.listScroll.scrollBar:SetPoint("TOPLEFT",self.listScroll.scrollBar:GetParent(),"TOPRIGHT",4,20)
 	self.listScroll.scrollBar:SetPoint("BOTTOMLEFT",self.listScroll.scrollBar:GetParent(),"BOTTOMRIGHT",4,11)
-	self.listScroll.scrollBar.trackBG:Show();
-	self.listScroll.scrollBar.trackBG:SetVertexColor(0, 0, 0, 0.75);
+	self.listScroll.scrollBar.trackBG:Show()
+	self.listScroll.scrollBar.trackBG:SetVertexColor(0, 0, 0, 0.75)
 
 	self.listScroll.update = PetList.PetJournal_UpdatePetList
-	self.listScroll.scrollBar.doNotHide = true;
+	self.listScroll.scrollBar.doNotHide = true
 
-	HybridScrollFrame_CreateButtons(self.listScroll, "CompanionListButtonTemplate", 44, 0);
-
+	HybridScrollFrame_CreateButtons(self.listScroll, "CompanionListButtonTemplate", 44, 0)
 
 	PetJournalPetCardPetInfo:SetScript("OnClick",nil)
 
@@ -183,28 +175,18 @@ function PetList:OnInitialize()
 	hooksecurefunc("PetJournal_SelectSpecies", PetList.PetJournal_SelectSpecies)
 	hooksecurefunc("PetJournal_SelectPet", PetList.PetJournal_SelectPet)
 	hooksecurefunc("PetJournal_UpdatePetLoadOut", PetList.PetJournal_UpdatePetLoadOut)
-
-
-
-
-
-
-
 end
 
-
 function PetList.PetJournal_UpdatePetCard(self)
-	local speciesID, customName, level , name, canBattle,breedIndex,confidence
+	local speciesID, customName, level, name, canBattle, breedIndex, confidence
 	if PetJournalPetCard.petID then
 		local petID = PetJournalPetCard.petID
-		speciesID, customName, level , _, _, _, _, name,_, _, _, _, _, _, canBattle, _, _ = C_PetJournal.GetPetInfoByPetID(petID);
+		speciesID, customName, level , _, _, _, _, name,_, _, _, _, _, _, canBattle, _, _ = C_PetJournal.GetPetInfoByPetID(petID)
 		if canBattle then
-			local health, maxHealth, power, speed, rarity = C_PetJournal.GetPetStats(petID);
-
+			local health, maxHealth, power, speed, rarity = C_PetJournal.GetPetStats(petID)
 			if rarity then
 				breedIndex, confidence = breedInfo:GetBreedByPetID(petID)
 				if breedIndex and confidence then
-
 					local pHealth, pPower, pSpeed  = breedInfo:GetPetPredictedStats(speciesID,breedIndex,rarity,25)
 					local color = GetColor(confidence)
 
@@ -232,13 +214,12 @@ function PetList.PetJournal_UpdatePetCard(self)
 		end
 	elseif  PetJournalPetCard.speciesID then
 		speciesID =  PetJournalPetCard.speciesID
-		name, _, _, _, _, _, _, canBattle = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
+		name, _, _, _, _, _, _, canBattle = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 	end
 
 	if  Config.display.breedInfo then
 		local availableBreeds = breedInfo:GetAvailableBreeds(speciesID)
 		if availableBreeds then
-
 			local stringBuilder = {}
 			for _,v in ipairs(availableBreeds) do tinsert(stringBuilder,breedInfo:GetBreedName(v)) end
 			local availableBreedsText = table.concat(stringBuilder,", ")
@@ -253,22 +234,20 @@ function PetList.PetJournal_UpdatePetCard(self)
 			tinsert(stringBuilder,AVAILABLE)
 			tinsert(stringBuilder,availableBreedsText)
 
-
-
 			name = table.concat(stringBuilder," ")
 		end
 	end
 
 	if customName then
-		self.PetInfo.name:SetText(customName);
-		self.PetInfo.name:SetHeight(24);
-		self.PetInfo.subName:Show();
-		self.PetInfo.subName:SetText(name);
+		self.PetInfo.name:SetText(customName)
+		self.PetInfo.name:SetHeight(24)
+		self.PetInfo.subName:Show()
+		self.PetInfo.subName:SetText(name)
 	else
 		self.PetInfo.name:SetWidth(225)
-		self.PetInfo.name:SetText(name);
-		self.PetInfo.name:SetHeight(32);
-		self.PetInfo.subName:Hide();
+		self.PetInfo.name:SetText(name)
+		self.PetInfo.name:SetHeight(32)
+		self.PetInfo.subName:Hide()
 	end
 
 	if self.PetInfo.name:IsTruncated() then
@@ -279,87 +258,77 @@ end
 
 function PetList.PetJournal_ShowPetDropdown(index, anchorTo, offsetX, offsetY)
 	if (not index) then
-		return;
+		return
 	end
 
 	DropDown.petOptionsMenu.pet = Sorting:GetPetByIndex(index)
-	index = Sorting:GetPetByIndex(index).index;
+	index = Sorting:GetPetByIndex(index).index
 	PetJournal.menuPetIndex = index
-	PetJournal.menuPetID = C_PetJournal.GetPetInfoByIndex(index);
+	PetJournal.menuPetID = C_PetJournal.GetPetInfoByIndex(index)
 
-	ToggleDropDownMenu(1, nil, DropDown.petOptionsMenu, anchorTo, offsetX, offsetY);
+	ToggleDropDownMenu(1, nil, DropDown.petOptionsMenu, anchorTo, offsetX, offsetY)
 end
 
 
 
 function PetList.PetJournal_ShowPetCard(index)
-	PetList.PetJournal_HidePetDropdown();
-	PetJournalPetCard.petIndex = index;
-	local owned;
+	PetList.PetJournal_HidePetDropdown()
+	PetJournalPetCard.petIndex = index
+	local owned
 	local pet = Sorting:GetPetByIndex(index)
 	if pet then
 		PetJournalPetCard.petID, PetJournalPetCard.speciesID, owned = C_PetJournal.GetPetInfoByIndex(pet.index, PetJournal.isWild);
 		if ( not owned ) then
-			PetJournalPetCard.petID = nil;
-			PetJournal_ShowPetCardBySpeciesID(PetJournalPetCard.speciesID);
-			return;
+			PetJournalPetCard.petID = nil
+			PetJournal_ShowPetCardBySpeciesID(PetJournalPetCard.speciesID)
+			return
 		end
-		PetJournal_UpdatePetCard(PetJournalPetCard);
-		PetJournal_UpdatePetList();
-		PetJournal_UpdateSummonButtonState();
+		PetJournal_UpdatePetCard(PetJournalPetCard)
+		PetJournal_UpdatePetList()
+		PetJournal_UpdateSummonButtonState()
 	end
 end
 
-
-
 function PetList.PetJournal_SelectSpecies(self, targetSpeciesID)
-	local petIndex = nil;
+	local petIndex = nil
 	local numPets = Sorting:GetNumPets()
 	for i = 1,numPets do
 		local pet = Sorting:GetPetByIndex(i)
-		local petID, speciesID, owned = C_PetJournal.GetPetInfoByIndex(pet.index, isWild);
+		local petID, speciesID, owned = C_PetJournal.GetPetInfoByIndex(pet.index, isWild)
 		if (speciesID == targetSpeciesID) then
-			petIndex = i;
-			break;
+			petIndex = i
+			break
 		end
 	end
 	if ( petIndex ) then
-		PetJournalPetList_UpdateScrollPos(PetList.listScroll, petIndex);
+		PetJournalPetList_UpdateScrollPos(PetList.listScroll, petIndex)
 	end
-	PetJournal_ShowPetCardBySpeciesID(targetSpeciesID);
+	PetJournal_ShowPetCardBySpeciesID(targetSpeciesID)
 end
-
-
-
 
 function PetList.PetJournal_UpdatePetList()
 
-	local scrollFrame = PetList.listScroll;
-	local offset = HybridScrollFrame_GetOffset(scrollFrame);
-	local petButtons = scrollFrame.buttons;
-	local pet, index;
+	local scrollFrame = PetList.listScroll
+	local offset = HybridScrollFrame_GetOffset(scrollFrame)
+	local petButtons = scrollFrame.buttons
+	local pet, index
+	local isWild = PetJournal.isWild
+	local numPets, numOwned = C_PetJournal.GetNumPets(isWild)
+	PetJournal.PetCount.Count:SetText(numOwned)
 
-	local isWild = PetJournal.isWild;
-
-	local numPets, numOwned = C_PetJournal.GetNumPets(isWild);
-	PetJournal.PetCount.Count:SetText(numOwned);
-
-	local summonedPetID = C_PetJournal.GetSummonedPetGUID();
+	local summonedPetID = C_PetJournal.GetSummonedPetGUID()
 
 	for i = 1,#petButtons do
-		pet = petButtons[i];
-
-		index = offset + i;
+		pet = petButtons[i]
+		index = offset + i
 		if index <= Sorting:GetNumPets() then
 
 			local mappedPet = Sorting:GetPetByIndex(index)
 
-			local petID, speciesID, isOwned, customName, level, favorite, isRevoked, name, icon, petType, creatureID, sourceText, description, isWildPet, canBattle = C_PetJournal.GetPetInfoByIndex(mappedPet.index, isWild);
+			local petID, speciesID, isOwned, customName, level, favorite, isRevoked, name, icon, petType, creatureID, sourceText, description, isWildPet, canBattle = C_PetJournal.GetPetInfoByIndex(mappedPet.index, isWild)
 
-			pet.icon:SetTexture(icon);
-			pet.petTypeIcon:SetTexture(GetPetTypeTexture(petType));
-
-
+			pet.icon:SetTexture(icon)
+			pet.petTypeIcon:SetTexture(GetPetTypeTexture(petType))
 			pet.dragButton.favorite:SetShown(favorite)
 
 			local isHidden = Sorting:IsSpeciesHidden(speciesID)
@@ -368,10 +337,6 @@ function PetList.PetJournal_UpdatePetList()
 			pet.highStatIcon:Hide()
 			if isOwned then
 				local health, maxHealth, attack, speed, rarity = C_PetJournal.GetPetStats(petID);
-
-				--enable borders for non wild pets
-
-
 				--compute and display max stat icon
 				if Config.display.maxStatIcon then
 					pet.highStatIcon:Hide()
@@ -400,11 +365,6 @@ function PetList.PetJournal_UpdatePetList()
 					pet.highStatIcon:Hide()
 				end
 
-
-
-
-
-
 				--color the names by their rarity
 				if Config.display.coloredNames and canBattle and rarity then
 					local r, g, b,hex  = GetItemQualityColor(rarity-1)
@@ -415,21 +375,19 @@ function PetList.PetJournal_UpdatePetList()
 					end
 				end
 
+				pet.dragButton.levelBG:SetShown(canBattle)
+				pet.dragButton.level:SetShown(canBattle)
+				pet.dragButton.level:SetText(level)
 
-
-				pet.dragButton.levelBG:SetShown(canBattle);
-				pet.dragButton.level:SetShown(canBattle);
-				pet.dragButton.level:SetText(level);
-
-				pet.icon:SetDesaturated(false);
-				pet.name:SetFontObject("GameFontNormal");
-				pet.petTypeIcon:SetShown(canBattle);
-				pet.petTypeIcon:SetDesaturated(false);
-				pet.dragButton:Enable();
+				pet.icon:SetDesaturated(false)
+				pet.name:SetFontObject("GameFontNormal")
+				pet.petTypeIcon:SetShown(canBattle)
+				pet.petTypeIcon:SetDesaturated(false)
+				pet.dragButton:Enable()
 
 				if (isWildPet) then
 					pet.iconBorder:Show();
-					pet.iconBorder:SetVertexColor(ITEM_QUALITY_COLORS[rarity-1].r, ITEM_QUALITY_COLORS[rarity-1].g, ITEM_QUALITY_COLORS[rarity-1].b);
+					pet.iconBorder:SetVertexColor(ITEM_QUALITY_COLORS[rarity-1].r, ITEM_QUALITY_COLORS[rarity-1].g, ITEM_QUALITY_COLORS[rarity-1].b)
 				elseif rarity and Config.display.coloredBorders and canBattle then
 					pet.iconBorder:SetVertexColor(ITEM_QUALITY_COLORS[rarity-1].r, ITEM_QUALITY_COLORS[rarity-1].g, ITEM_QUALITY_COLORS[rarity-1].b)
 					pet.iconBorder:Show()
@@ -438,31 +396,29 @@ function PetList.PetJournal_UpdatePetList()
 				end
 
 				if (health and health <= 0) then
-					pet.isDead:Show();
+					pet.isDead:Show()
 				else
-					pet.isDead:Hide();
+					pet.isDead:Hide()
 				end
 				if(isRevoked == true) then
-					pet.dragButton.levelBG:Hide();
-					pet.dragButton.level:Hide();
-					pet.iconBorder:Hide();
-					pet.icon:SetDesaturated(true);
-					pet.petTypeIcon:SetDesaturated(true);
-					pet.dragButton:Disable();
+					pet.dragButton.levelBG:Hide()
+					pet.dragButton.level:Hide()
+					pet.iconBorder:Hide()
+					pet.icon:SetDesaturated(true)
+					pet.petTypeIcon:SetDesaturated(true)
+					pet.dragButton:Disable()
 				end
 			else
-				pet.dragButton.levelBG:Hide();
-				pet.dragButton.level:Hide();
-				pet.icon:SetDesaturated(true);
-				pet.iconBorder:Hide();
-				pet.name:SetFontObject("GameFontDisable");
-				pet.petTypeIcon:SetShown(canBattle);
-				pet.petTypeIcon:SetDesaturated(true);
-				pet.dragButton:Disable();
-				pet.isDead:Hide();
+				pet.dragButton.levelBG:Hide()
+				pet.dragButton.level:Hide()
+				pet.icon:SetDesaturated(true)
+				pet.iconBorder:Hide()
+				pet.name:SetFontObject("GameFontDisable")
+				pet.petTypeIcon:SetShown(canBattle)
+				pet.petTypeIcon:SetDesaturated(true)
+				pet.dragButton:Disable()
+				pet.isDead:Hide()
 			end
-
-
 
 			local pjePet =  Sorting:GetPet(petID)
 			local breed = ""
@@ -472,73 +428,61 @@ function PetList.PetJournal_UpdatePetList()
 
 			if customName then
 				pet.name:SetText(string.format("%s %s",customName,breed))
-				pet.name:SetHeight(12);
-				pet.subName:Show();
-				pet.subName:SetText(name);
+				pet.name:SetHeight(12)
+				pet.subName:Show()
+				pet.subName:SetText(name)
 			elseif name then
 				pet.name:SetText(string.format("%s %s",name,breed))
-				pet.name:SetHeight(30);
-				pet.subName:Hide();
+				pet.name:SetHeight(30)
+				pet.subName:Hide()
 			else
 				pet.name:SetText(nil)
-				pet.name:SetHeight(30);
-				pet.subName:Hide();
+				pet.name:SetHeight(30)
+				pet.subName:Hide()
 			end
 
 			if ( petID and petID == summonedPetID ) then
-				pet.dragButton.ActiveTexture:Show();
+				pet.dragButton.ActiveTexture:Show()
 			else
-				pet.dragButton.ActiveTexture:Hide();
+				pet.dragButton.ActiveTexture:Hide()
 			end
 
-			pet.petID = petID;
-			pet.speciesID = speciesID;
-			pet.index = index;
-			pet.owned = isOwned;
-			pet:Show();
+			pet.petID = petID
+			pet.speciesID = speciesID
+			pet.index = index
+			pet.owned = isOwned
+			pet:Show()
 
 			--Update Petcard Button
 			if PetJournalPetCard.petIndex == index then
-				pet.selected = true;
-				pet.selectedTexture:Show();
+				pet.selected = true
+				pet.selectedTexture:Show()
 			else
 				pet.selected = false;
 				pet.selectedTexture:Hide()
 			end
-
-
-
-
 		else
-			pet:Hide();
+			pet:Hide()
 		end
 	end
 
-	local totalHeight = Sorting:GetNumPets() * COMPANION_BUTTON_HEIGHT;
-	HybridScrollFrame_Update(scrollFrame, totalHeight, scrollFrame:GetHeight());
+	local totalHeight = Sorting:GetNumPets() * COMPANION_BUTTON_HEIGHT
+	HybridScrollFrame_Update(scrollFrame, totalHeight, scrollFrame:GetHeight())
 end
-
-
 
 function PetList.PetJournal_FindPetCardIndex()
-	PetJournalPetCard.petIndex = nil;
+	PetJournalPetCard.petIndex = nil
 	local numPets = Sorting:GetNumPets()
 	for i = 1, numPets do
-		local pet = Sorting:GetPetByIndex(i);
-		local petID, speciesID, owned = C_PetJournal.GetPetInfoByIndex(pet.index,false);
+		local pet = Sorting:GetPetByIndex(i)
+		local petID, speciesID, owned = C_PetJournal.GetPetInfoByIndex(pet.index,false)
 		if (owned and petID == PetJournalPetCard.petID) or
 			(not owned and speciesID == PetJournalPetCard.speciesID)  then
-				PetJournalPetCard.petIndex = i;
-				break;
+				PetJournalPetCard.petIndex = i
+				break
 		end
 	end
 end
-
-
-
-
-
-
 
 function PetList.PetJournal_SelectPet(self, targetPetID)
 	local pet, index
@@ -553,18 +497,16 @@ function PetList.PetJournal_SelectPet(self, targetPetID)
 
 	if pet then
 		if ( index ) then --might be filtered out and have no index.
-			PetJournalPetList_UpdateScrollPos(PetList.listScroll, index);
+			PetJournalPetList_UpdateScrollPos(PetList.listScroll, index)
 		end
-		PetJournal_ShowPetCardByID(targetPetID);
+		PetJournal_ShowPetCardByID(targetPetID)
 	end
 end
-
-
 
 function PetList.PetJournal_UpdatePetLoadOut()
 	if Config.display.coloredNames then
 		for i=1, MAX_ACTIVE_PETS do
-			local Pet = PetJournal.Loadout["Pet"..i];
+			local Pet = PetJournal.Loadout["Pet"..i]
 			local petID, _, _, _, locked =  C_PetJournal.GetPetLoadOutInfo(i)
 			if not locked and petID then
 				local _, customName, _, _, _, _, _,name = C_PetJournal.GetPetInfoByPetID(petID)
@@ -576,9 +518,9 @@ function PetList.PetJournal_UpdatePetLoadOut()
 
 				if customName then
 					Pet.subName:SetText(string.format(rarityFormat,hex,customName))
-					Pet.name:SetText(string.format("|c%s%s|r%s",hex,name,breedName));
+					Pet.name:SetText(string.format("|c%s%s|r%s",hex,name,breedName))
 				else
-					Pet.name:SetText(string.format("|c%s%s|r %s",hex,name,breedName));
+					Pet.name:SetText(string.format("|c%s%s|r %s",hex,name,breedName))
 				end
 			end
 		end

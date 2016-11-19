@@ -288,7 +288,7 @@ zoneIDs.continents = {
 		995, -- Upper Blackrock Spire
 		994, -- Highmaul
 		988, -- Blackrock Foundry
-	}
+	},
 }
 
 
