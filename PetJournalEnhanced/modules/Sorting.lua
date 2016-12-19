@@ -1,16 +1,16 @@
-local Sorting = PetJournalEnhanced:NewModule("Sorting","AceEvent-3.0")
-local BreedInfo  = LibStub("LibPetBreedInfo-1.0")
+local Sorting = PetJournalEnhanced:NewModule("Sorting", "AceEvent-3.0")
+local BreedInfo = LibStub("LibPetBreedInfo-1.0")
 local BREED_HIGH_CONFIDENCE = 2
 local MAX_BALANCED = 1
 local MAX_SPEED = 2
 local MAX_STAMINA = 3
 local MAX_ATTACK = 4
-local _
-local ASCENDING =  1
+local ASCENDING = 1
 local DESCENDING = 2
 local USER = nil
+local PetJournalEnhanced = PetJournalEnhanced
 
--- GLOBALS: C_PetJournal LE_PET_JOURNAL_FILTER_COLLECTED LE_PET_JOURNAL_FILTER_NOT_COLLECTED
+-- GLOBALS: C_PetJournal PetJournal LE_PET_JOURNAL_FILTER_COLLECTED LE_PET_JOURNAL_FILTER_NOT_COLLECTED PetJournalSearchBox
 
 local petMapping = {}
 
@@ -32,7 +32,6 @@ end
 
 local GetSortFunctions
 do
-
 	local function GetCompareFunc(var,func,direction)
 		return function(a,b)
 			local order = Sorting.db.global.sorting.order
@@ -68,23 +67,23 @@ do
 		for i=#args,1,-2 do
 			local name = args[i-1];
 			local direction = args[i]
-			func = GetCompareFunc(name,func,direction)
+			func = GetCompareFunc(name, func, direction)
 		end
 		return func
 	end
 
 	local sortFunctions =  {
-			ComposeSortFunction("isOwned",DESCENDING,"level",  USER,"name", ASCENDING),--level
-			ComposeSortFunction("isOwned",DESCENDING,"name",   USER,"level",DESCENDING),--alpha
-			ComposeSortFunction("isOwned",DESCENDING,"petType",USER,"level",DESCENDING,"name",ASCENDING),--pet type
-			ComposeSortFunction("isOwned",DESCENDING,"rarity", USER,"level",DESCENDING,"name",ASCENDING),--rarity
-			ComposeSortFunction("isOwned",DESCENDING,"maxStat",USER,"level",DESCENDING,"name",ASCENDING),--specialization
-			ComposeSortFunction("isOwned",DESCENDING,"breed",USER,"level",DESCENDING,"name",ASCENDING),--specialization
+			ComposeSortFunction("isOwned", DESCENDING, "level", USER, "name", ASCENDING),
+			ComposeSortFunction("isOwned", DESCENDING, "name", USER, "level", DESCENDING),
+			ComposeSortFunction("isOwned", DESCENDING, "petType", USER, "level", DESCENDING, "name", ASCENDING),
+			ComposeSortFunction("isOwned", DESCENDING, "rarity", USER, "level", DESCENDING, "name", ASCENDING),
+			ComposeSortFunction("isOwned", DESCENDING, "maxStat", USER, "level", DESCENDING, "name", ASCENDING),
+			ComposeSortFunction("isOwned", DESCENDING, "breed", USER, "level", DESCENDING, "name", ASCENDING),
 		}
 
 	local sortFunctionsFavoritesFirst =  {}
 	for i=1,#sortFunctions do
-		sortFunctionsFavoritesFirst[i] = GetCompareFunc("favorite",   sortFunctions[i],  DESCENDING)
+		sortFunctionsFavoritesFirst[i] = GetCompareFunc("favorite", sortFunctions[i], DESCENDING)
 	end
 
 	function GetSortFunctions()
@@ -105,18 +104,57 @@ function Sorting:OnInitialize()
 	local defaults = {
 		global = {
 			filtering = {
-				rarity = {[1]=true,[2]=true,[3]=true,[4]=true},
-				breed = {[3]=true,[4]=true,[5]=true,[6]=true,[7]=true,[8]=true,[9]=true,[10]=true,[11]=true,[12]=true,},
-				specialization = {[1]=true,[2]=true,[3]=true,[4]=true},
-				level = {[1]=true,[2]=true,[3]=true,[4]=true,[5]=true},
-				quantity = {[1]=true,[2]=true,[3]=true},
+				rarity = {
+					[1] = true,
+					[2] = true,
+					[3] = true,
+					[4] = true
+				},
+				breed = {
+					[3] = true,
+					[4] = true,
+					[5] = true,
+					[6] = true,
+					[7] = true,
+					[8] = true,
+					[9] = true,
+					[10] = true,
+					[11] = true,
+					[12] = true,
+				},
+				specialization = {
+					[1] = true,
+					[2] = true,
+					[3] = true,
+					[4] = true
+				},
+				level = {
+					[1] = true,
+					[2] = true,
+					[3] = true,
+					[4] = true,
+					[5] = true
+				},
+				quantity = { [1] = true, [2] = true, [3] = true },
 				currentZone = false,
-				canBattle =true,
+				canBattle = true,
 				cantBattle = true,
 				unknownZone = true,
 				cantTrade = true,
 				canTrade = true,
-				abilityType = {[1]=true,[2]=true,[3]=true,[3]=true,[4]=true,[5]=true,[6]=true,[7]=true,[8]=true,[9]=true,[10]=true},
+				abilityType = {
+					[1] = true,
+					[2] = true,
+					[3] = true,
+					[3] = true,
+					[4] = true,
+					[5] = true,
+					[6] = true,
+					[7] = true,
+					[8] = true,
+					[9] = true,
+					[10] = true
+				},
 				hiddenSpecies = false,
 				favroritesOnly = false,
 			},
@@ -128,7 +166,7 @@ function Sorting:OnInitialize()
 			hiddenSpecies = {},
 		}
 	}
-	local db = LibStub("AceDB-3.0"):New("PetJournalEnhancedDB", {} , true)
+	local db = LibStub("AceDB-3.0"):New("PetJournalEnhancedDB", {}, true)
 	local name = self:GetName()
 	self.db = db:RegisterNamespace(name, defaults)
 	self.db.global.filtering.unknownZone = true --always reset to true
@@ -139,10 +177,10 @@ function Sorting:OnInitialize()
 	self:RegisterEvent("PET_JOURNAL_PET_DELETED")
 
 	local LibPetJournal = LibStub("LibPetJournal-2.0")
-	LibPetJournal.RegisterCallback(self,"PostPetListUpdated", "ScanPets")
+	LibPetJournal.RegisterCallback(self, "PostPetListUpdated", "ScanPets")
 
-	PetJournalSearchBox:HookScript("OnTextChanged",function()  Sorting:SortPets() end)
-	hooksecurefunc(C_PetJournal,"SetFavorite",function() Sorting:UpdatePets() end)
+	PetJournalSearchBox:HookScript("OnTextChanged", function()  Sorting:SortPets() end)
+	hooksecurefunc(C_PetJournal,"SetFavorite", function() Sorting:UpdatePets() end)
 end
 
 
@@ -171,9 +209,9 @@ end
 
 function Sorting:Reset()
 	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_COLLECTED, true)
-	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED, true);
-	C_PetJournal.SetAllPetTypesChecked(true);
-	C_PetJournal.SetAllPetSourcesChecked(true);
+	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED, true)
+	C_PetJournal.SetAllPetTypesChecked(true)
+	C_PetJournal.SetAllPetSourcesChecked(true)
 
 	self.ZoneFiltering:SetAllFiltered(true)
 
@@ -210,7 +248,7 @@ function Sorting:Reset()
 	filtering.unknownZone = true
 	filtering.canTrade = true
 	filtering.cantTrade = true
-	filtering.favoritesOnly = false;
+	filtering.favoritesOnly = false
 
 	sorting.selection = 2
 	sorting.order = ASCENDING
@@ -239,8 +277,7 @@ end
 
 do
 	--Return highest stat for a pet. Check constants for return values.
-	local function GetMaxStat(maxHealth,attack,speed)
-
+	local function GetMaxStat(maxHealth, attack, speed)
 		local maxHealth = tonumber(maxHealth)
 		local stamina = tonumber(math.floor((maxHealth -100)/5))
 		local attack = tonumber(attack)
@@ -256,7 +293,7 @@ do
 		return MAX_BALANCED
 	end
 
-	local function CreatePet(petID,speciesID,isOwned,name,petType,canBattle,tradable,rarity,level,sourceText,maxHealth, attack, speed)
+	local function CreatePet(petID, speciesID, isOwned, name, petType, canBattle, tradable, rarity, level, sourceText, maxHealth, attack, speed)
 		local pet = {}
 		pet.speciesID = speciesID
 		pet.petID = petID
@@ -274,7 +311,7 @@ do
 		pet.sourceText = sourceText
 
 		if isOwned and canBattle and maxHealth and attack and speed then
-			pet.maxStat = GetMaxStat(maxHealth,attack,speed)
+			pet.maxStat = GetMaxStat(maxHealth, attack, speed)
 			local breed, breedConfidence = BreedInfo:GetBreedByPetID(petID)
 			if breed then
 				pet.breed, pet.breedConfidence = breed, breedConfidence
@@ -284,8 +321,8 @@ do
 		if canBattle then
 			local abilityIDs = C_PetJournal.GetPetAbilityList(pet.speciesID);
 			for j=1, #abilityIDs do
-				local _,_,abilityType = C_PetJournal.GetPetAbilityInfo(abilityIDs[j]);
-				pet.abilityFilter = bit.bor(pet.abilityFilter,2^abilityType);
+				local _, _, abilityType = C_PetJournal.GetPetAbilityInfo(abilityIDs[j]);
+				pet.abilityFilter = bit.bor(pet.abilityFilter, 2^abilityType);
 			end
 		else
 			pet.level = 0
@@ -295,11 +332,11 @@ do
 		return pet
 	end
 
-	local function UpdatePet(pet, level, favorite, index,rarity)
+	local function UpdatePet(petID, pet, level, favorite, index, rarity)
 		pet.owned = C_PetJournal.GetNumCollectedInfo(pet.speciesID)
 		pet.favorite = favorite
 		pet.index = index
-
+		pet.petID = petID
 
 		if pet.canBattle and pet.isOwned then
 			if pet.breedConfidence < BREED_HIGH_CONFIDENCE and level > pet.level then
@@ -317,7 +354,6 @@ do
 		--local start =  debugprofilestop()
 
 		local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
-
 		local ZoneFiltering = self.ZoneFiltering
 
 		wipe(petMapping)
@@ -336,11 +372,11 @@ do
 			local pet = self:GetPet(id)
 
 			if not pet then
-				pet = CreatePet(petID,speciesID,isOwned,name,petType,canBattle,tradable,rarity,level,sourceText,maxHealth, attack, speed)
+				pet = CreatePet(petID, speciesID, isOwned, name, petType, canBattle, tradable, rarity, level, sourceText, maxHealth, attack, speed)
 				SetPet(pet)
 			end
 
-			UpdatePet(pet,level,favorite,i,rarity)
+			UpdatePet(petID, pet, level, favorite, i, rarity)
 
 			--filter pet
 			local exclude = false
@@ -354,9 +390,9 @@ do
 			end
 		end
 
-		local sortFuncs =  GetSortFunctions()
+		local sortFuncs = GetSortFunctions()
 		local sortFunc = sortFuncs[self.sorting.selection]
-		table.sort(petMapping,sortFunc)
+		table.sort(petMapping, sortFunc)
 		self.callbacks:Fire("PETS_SORTED")
 
 		--local stop =  debugprofilestop() - start
@@ -364,7 +400,6 @@ do
 	end
 	Sorting.UpdatePets = Sorting.SortPets
 end
-
 
 do
 	local function BitwiseAndTable(tbl)
@@ -390,70 +425,71 @@ do
 				exclude = function(self,pet) return false end
 			},
 			]]
-			{--can battle
+			{
 				name = "can battle",
-				enabled = function() return  not filtering.canBattle end,
-				exclude = function(self,pet) return pet.canBattle end
+				enabled = function() return not filtering.canBattle end,
+				exclude = function(self, pet) return pet.canBattle end
 			},
-			{--can battle
+			{
 				name = "favorites only",
-				enabled = function() return  filtering.favoritesOnly end,
-				exclude = function(self,pet)
+				enabled = function() return filtering.favoritesOnly end,
+				exclude = function(self, pet)
 					if pet.isOwned and not pet.favorite then
 						return true end
 				 	return false
 				 end
 			},
-			{--cant battle
+			{
 				name = "cant battle",
 				enabled = function() return not filtering.cantBattle end,
-				exclude = function(self,pet)  return not pet.canBattle  end
+				exclude = function(self, pet)  return not pet.canBattle  end
 			},
-			{--can trade
+			{
 				name = "can trade",
 				enabled = function() return not filtering.canTrade end,
-				exclude = function(self,pet)  return pet.tradable  end
+				exclude = function(self, pet)  return pet.tradable  end
 			},
-			{--cant trade
+			{
 				name = "cant trade",
 				enabled = function() return not filtering.cantTrade end,
-				exclude = function(self,pet)  return not pet.tradable  end
+				exclude = function(self, pet)  return not pet.tradable  end
 			},
-			{--rarity
+			{
 				name = "rarity",
 				enabled = function() return not BitwiseAndTable(filtering.rarity) end,
-				exclude = function(self,pet)  return pet.rarity and pet.rarity > 0 and not filtering.rarity[pet.rarity] end
+				exclude = function(self, pet)  return pet.rarity and pet.rarity > 0 and not filtering.rarity[pet.rarity] end
 			},
-			{--quantity
+			{
 				name = "quantity",
 				enabled = function() return not BitwiseAndTable(filtering.quantity) end,
-				exclude = function(self,pet)  return pet.owned > 0 and not filtering.quantity[pet.owned] end
+				exclude = function(self, pet)  return pet.owned > 0 and not filtering.quantity[pet.owned] end
 			},
-			{--pet spec
+			{
 				name = "pet spec",
 				enabled = function() return not BitwiseAndTable(filtering.specialization) end,
-				exclude = function(self,pet)  return pet.maxStat > 0 and  not filtering.specialization[pet.maxStat] end
+				exclude = function(self, pet)  return pet.maxStat > 0 and  not filtering.specialization[pet.maxStat] end
 			},
-			{--current zone
+			{
 				name = "current zone",
 				initialize = function(self) self.currentZoneId =  GetCurrentMapAreaID() end,
 				enabled = function() return filtering.currentZone end,
-				exclude = function(self,pet)
+				exclude = function(self, pet)
 					local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
 					return (zones == nil or not zones[self.currentZoneId])
 				end
 			},
-			{--unknown zone
+			{
 				name = "unknown zone",
 				enabled = function() return not filtering.unknownZone end,
-				exclude = function(self,pet)  return ZoneFiltering:GetZonesBySpeciesID(pet.speciesID) == nil end
+				exclude = function(self, pet)  return ZoneFiltering:GetZonesBySpeciesID(pet.speciesID) == nil end
 			},
-			{--breed
+			{
 				name = "breed",
 				enabled = function() return not BitwiseAndTable(filtering.breed) end,
-				exclude = function(self,pet)  return pet.breed > 0 and  not filtering.breed[pet.breed] end
+				exclude = function(self, pet)  return pet.breed > 0 and  not filtering.breed[pet.breed] end
 			},
-			--[[{--level-1
+			--[[
+			{
 				name = "level",
 				enabled = function() return not BitwiseAndTable(filtering.level) end,
 				exclude = function(self,pet)
@@ -464,30 +500,30 @@ do
 					(not filtering.level[4] and pet.level <= 24 and pet.level >= 20) or
 					(not filtering.level[5] and pet.level == 25)
 				 end
-			},]]
-
-			{--ability filter
+			},
+			]]
+			{
 				name = "ability",
 				abilityFilter = 0,
 				initialize = function(self)
 					self.abilityFilter = 0
 					for i=1,#filtering.abilityType do
 						if filtering.abilityType[i] then
-							self.abilityFilter = bit.bor(self.abilityFilter,2^i);
+							self.abilityFilter = bit.bor(self.abilityFilter, 2^i);
 						end
 					end
 				end,
 				enabled = function()
 					return not BitwiseAndTable(filtering.abilityType)
 				end,
-				exclude = function(self,pet)
-					return pet.canBattle and bit.band(self.abilityFilter,pet.abilityFilter) == 0
+				exclude = function(self, pet)
+					return pet.canBattle and bit.band(self.abilityFilter, pet.abilityFilter) == 0
 				end,
 			},
-			{ --zone filtering
+			{
 				name = "zone selection",
 				enabled = function() return not ZoneFiltering:IsEveryZoneEnabled() end,
-				exclude = function(self,pet)
+				exclude = function(self, pet)
 					local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
 					if zones then
 						local filtered = false
@@ -502,23 +538,22 @@ do
 			{
 				name = "hidden species",
 				enabled = function() return not filtering.hiddenSpecies end,
-				exclude = function(self,pet)
+				exclude = function(self, pet)
 					return Sorting:IsSpeciesHidden(pet.speciesID)
 				end
 			},
-
 		}
 
-		local levelRanges = {{1,1},{2,10},{11,20},{21,24},{25,25}}
+		local levelRanges = {{1,1}, {2,10}, {11,20}, {21,24}, {25,25}}
 		for i=1,#levelRanges do
 			local filter = {
 				name = "level "..levelRanges[i][1].."-"..levelRanges[i][2],
 				enabled = function() return not filtering.level[i] end,
-				exclude = function(self,pet)
+				exclude = function(self, pet)
 					return pet.level and pet.level >= levelRanges[i][1] and pet.level <=  levelRanges[i][2]
-				 end
+				end
 			}
-			table.insert(Sorting.filters,filter)
+			table.insert(Sorting.filters, filter)
 		end
 	end
 
@@ -532,7 +567,7 @@ do
 
 			if self.filters[i].enabled() then
 				--print(self.filters[i].name or "Error: no filter name")
-				table.insert(activeFilters,self.filters[i])
+				table.insert(activeFilters, self.filters[i])
 			end
 		end
 		return activeFilters

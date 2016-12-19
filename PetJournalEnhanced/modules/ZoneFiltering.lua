@@ -1,31 +1,30 @@
 local ZoneFiltering = PetJournalEnhanced:NewModule("ZoneFiltering")
 local zoneIDs = PetJournalEnhanced:GetModule("ZoneIDs")
-local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
+local L = LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
 local CONTINUED = L["Continued"]
 local INSTANCES = L["Instances"]
 
--- GLOBALS: C_PetJournal
+-- GLOBALS: C_PetJournal, InsertNewPets, MacroFrameText
 
 function ZoneFiltering:OnInitialize()
 
 	--self:FindNewPets()
 	self.ZoneGroupNames= {}
-	local continentsP6 = { GetMapContinents() };
-	local index = 0;
+	local continentsP6 = { GetMapContinents() }
+	local index = 0
 	for i = 2, #continentsP6, 2 do
-	 index = index + 1;
-	 self.ZoneGroupNames[index] = continentsP6[i];
+		index = index + 1
+		self.ZoneGroupNames[index] = continentsP6[i]
 	end
 	--self.ZoneGroupNames = {GetMapContinents()}
 	table.insert(self.ZoneGroupNames, INSTANCES)
 
 	local ZoneToSpecies = {}
 
-
 	--create temporary mapping between zones and species to figure out which zones contain pets
 	local SpeciesToZoneId = zoneIDs.SpeciesToZoneId
 	for speciesID,zones in pairs(SpeciesToZoneId) do
-		for zoneID,_ in pairs(zones) do
+		for zoneID, _ in pairs(zones) do
 			if not ZoneToSpecies[zoneID] then ZoneToSpecies[zoneID] = true end
 		end
 	end
@@ -33,10 +32,10 @@ function ZoneFiltering:OnInitialize()
 	--remove empty zones from zone groups
 	local zoneGroups = zoneIDs.continents
 	for i=1, #zoneGroups do
-		for j=#zoneGroups[i], 1,-1  do
+		for j=#zoneGroups[i], 1, -1 do
 			local zoneID = zoneGroups[i][j]
 			if not ZoneToSpecies[zoneID] then
-				table.remove(zoneGroups[i],j)
+				table.remove(zoneGroups[i], j)
 			end
 		end
 	end
@@ -51,19 +50,18 @@ function ZoneFiltering:OnInitialize()
 		end
 	end
 
-	for i= 1 ,#self.ZoneGroupNames do
+	for i= 1,#self.ZoneGroupNames do
 		if #zoneIDs.continents[i] > 16 then
-			table.insert(self.ZoneGroupNames,i+1,self.ZoneGroupNames[i].." "..CONTINUED);
-			table.insert(zoneIDs.continents,i+1,{});
+			table.insert(self.ZoneGroupNames, i+1, self.ZoneGroupNames[i].." "..CONTINUED)
+			table.insert(zoneIDs.continents, i+1, {})
 			for j = math.ceil(#zoneIDs.continents[i]/2), #zoneIDs.continents[i] do
-				table.insert(zoneIDs.continents[i+1],zoneIDs.continents[i][j]);
+				table.insert(zoneIDs.continents[i+1], zoneIDs.continents[i][j])
 			end
 			for j = #zoneIDs.continents[i], math.ceil(#zoneIDs.continents[i]/2), -1 do
-				table.remove(zoneIDs.continents[i],j)
+				table.remove(zoneIDs.continents[i], j)
 			end
 		end
 	end
-
 end
 
 function ZoneFiltering:GetNumZoneGroups()
@@ -87,7 +85,7 @@ function ZoneFiltering:GetZonesBySpeciesID(speciesID)
 	return zoneIDs.SpeciesToZoneId[speciesID]
 end
 
-function ZoneFiltering:SetFiltered(zoneID,enabled)
+function ZoneFiltering:SetFiltered(zoneID, enabled)
 	self.zoneFilter[zoneID] = enabled
 end
 
@@ -101,7 +99,7 @@ function ZoneFiltering:SetAllFiltered(enabled)
 	end
 end
 
-function ZoneFiltering:SetAllGroupFiltered(groupID,enabled)
+function ZoneFiltering:SetAllGroupFiltered(groupID, enabled)
 	local zones = zoneIDs.continents[groupID]
 	if not zones then return end
 
@@ -120,7 +118,6 @@ function ZoneFiltering:IsEveryZoneEnabled()
 	return true;
 end
 
-
 --/run FindNewPets()
 function ZoneFiltering:FindNewPets()
 	--zoneIDs.SpeciesToZoneId = {}
@@ -130,8 +127,8 @@ function ZoneFiltering:FindNewPets()
 	local numPets = C_PetJournal.GetNumPets()
 
 	local zoneMap = {
-		["stormwind"]=301,
-		["shattrath"]=481,
+		["stormwind"] = 301,
+		["shattrath"] = 481,
 		["brawl'gar arena"] = 321,
 		["the barrens"] = 11,
 		["terokkar forest (fishing nodes)"] = 478,
@@ -167,14 +164,17 @@ function ZoneFiltering:FindNewPets()
 	for i=1, numPets do
 		local _, speciesID, _, _, _, _, _, name, _, _, _, sourceText = C_PetJournal.GetPetInfoByIndex(i)
 
-		if zoneIDs.SpeciesToZoneId[speciesID] == nil and (string.find(sourceText,"Pet Battle:",1,true) or string.find(sourceText,"Zone:",1,true) or string.find(sourceText,"Raid:",1,true) ) then
+		if zoneIDs.SpeciesToZoneId[speciesID] == nil and (
+		string.find(sourceText, "Pet Battle:", 1, true) or
+		string.find(sourceText, "Zone:", 1, true) or
+		string.find(sourceText, "Raid:", 1, true) ) then
 			sourceText = string.lower(sourceText)
-			sourceText = string.gsub(sourceText,"|[rn]","")
-			sourceText = string.gsub(sourceText,"|c%x%x%x%x%x%x%x%x","")
-			local zoneText = string.match(sourceText,"zone:(.*)") or string.match(sourceText,"raid:(.*)") or string.match(sourceText,"drop:(.*)") or string.match(sourceText,"pet battle:(.*)")
+			sourceText = string.gsub(sourceText, "|[rn]", "")
+			sourceText = string.gsub(sourceText, "|c%x%x%x%x%x%x%x%x", "")
+			local zoneText = string.match(sourceText, "zone:(.*)") or string.match(sourceText, "raid:(.*)") or string.match(sourceText, "drop:(.*)") or string.match(sourceText, "pet battle:(.*)")
 			if zoneText then
 				for x = 1, #keywords do
-					zoneText = string.gsub(zoneText,keywords[x]..":.*","")
+					zoneText = string.gsub(zoneText, keywords[x]..":.*", "")
 				end
 			end
 
@@ -189,7 +189,7 @@ function ZoneFiltering:FindNewPets()
 						entry = entry .. "["..entryText.."]="..entryText..","
 				end
 				entry = entry .. "}, -- "..name.."|n"
-				entry= entry.gsub(entry,",}","}")
+				entry= entry.gsub(entry, ",}", "}")
 				if not string.find(self.newPets, entry, 1, true) then
 					self.newPets = self.newPets .. entry
 				end
