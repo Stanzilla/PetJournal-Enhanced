@@ -1,13 +1,12 @@
 ## Interface: 70100
 ## Title: PetJournal Enhanced
-## Notes: Displays the rarity of the enemies pets in their tooltip.
+## Notes: Enhances the Pet Journal with various functions and filters.
 ## Author: nullberri
 ## Version: @project-version@
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
 ## SavedVariables: PetJournalEnhancedDB
 ## X-Category: Pet Journal
-## X-Localizations: enUS, deDe, ruRU
 
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
