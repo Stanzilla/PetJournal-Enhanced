@@ -856,7 +856,7 @@ function DropDown:OnInitialize()
     UIDropDownMenu_Initialize(self.menuFrame, CreateDropdownMenu , "MENU")
     UIDropDownMenu_Initialize(self.petOptionsMenu, PetOptionsMenu_Init , "MENU")
     self.filterButton:SetScript("OnClick",function()
-        PlaySound("igMainMenuOptionCheckBoxOn")
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
         ToggleDropDownMenu(1, nil, self.menuFrame, "PetJournalEnhancedFilterButton", 74, 15)
     end)
 end
