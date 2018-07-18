@@ -96,7 +96,7 @@ do
 end
 
 function Sorting:OnInitialize()
-    self.ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
+    -- self.ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
     self.callbacks = LibStub("CallbackHandler-1.0"):New(self)
 
     local defaults = {
@@ -468,20 +468,20 @@ do
                 enabled = function() return not BitwiseAndTable(filtering.specialization) end,
                 exclude = function(self, pet)  return pet.maxStat > 0 and  not filtering.specialization[pet.maxStat] end
             },
-            {
-                name = "current zone",
-                initialize = function(self) self.currentZoneId =  GetCurrentMapAreaID() end,
-                enabled = function() return filtering.currentZone end,
-                exclude = function(self, pet)
-                    local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
-                    return (zones == nil or not zones[self.currentZoneId])
-                end
-            },
-            {
-                name = "unknown zone",
-                enabled = function() return not filtering.unknownZone end,
-                exclude = function(self, pet)  return ZoneFiltering:GetZonesBySpeciesID(pet.speciesID) == nil end
-            },
+            -- {
+            --     name = "current zone",
+            --     initialize = function(self) self.currentZoneId =  C_Map.GetBestMapForUnit("player") end,
+            --     enabled = function() return filtering.currentZone end,
+            --     exclude = function(self, pet)
+            --         local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
+            --         return (zones == nil or not zones[self.currentZoneId])
+            --     end
+            -- },
+            -- {
+            --     name = "unknown zone",
+            --     enabled = function() return not filtering.unknownZone end,
+            --     exclude = function(self, pet)  return ZoneFiltering:GetZonesBySpeciesID(pet.speciesID) == nil end
+            -- },
             {
                 name = "breed",
                 enabled = function() return not BitwiseAndTable(filtering.breed) end,
@@ -519,21 +519,21 @@ do
                     return pet.canBattle and bit.band(self.abilityFilter, pet.abilityFilter) == 0
                 end,
             },
-            {
-                name = "zone selection",
-                enabled = function() return not ZoneFiltering:IsEveryZoneEnabled() end,
-                exclude = function(self, pet)
-                    local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
-                    if zones then
-                        local filtered = false
-                        for k,v in pairs(zones) do
-                            filtered = filtered or ZoneFiltering:GetFiltered(k)
-                        end
-                        return not filtered
-                    end
-                    return false
-                end
-            },
+            -- {
+            --     name = "zone selection",
+            --     enabled = function() return not ZoneFiltering:IsEveryZoneEnabled() end,
+            --     exclude = function(self, pet)
+            --         local zones = ZoneFiltering:GetZonesBySpeciesID(pet.speciesID)
+            --         if zones then
+            --             local filtered = false
+            --             for k,v in pairs(zones) do
+            --                 filtered = filtered or ZoneFiltering:GetFiltered(k)
+            --             end
+            --             return not filtered
+            --         end
+            --         return false
+            --     end
+            -- },
             {
                 name = "hidden species",
                 enabled = function() return not filtering.hiddenSpecies end,

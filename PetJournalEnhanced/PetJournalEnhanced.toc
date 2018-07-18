@@ -40,7 +40,7 @@ modules\StaticData.lua
 modules\config.lua
 
 #dep: StaticData
-modules\ZoneFiltering.lua
+#modules\ZoneFiltering.lua
 
 #dep: Config
 modules\UniqueCount.lua

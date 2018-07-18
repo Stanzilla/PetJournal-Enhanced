@@ -5,7 +5,7 @@ local Sorting = PetJournalEnhanced:GetModule("Sorting")
 local ASCENDING =  1
 local DESCENDING = 2
 local breedInfo = LibStub("LibPetBreedInfo-1.0")
-local ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
+-- local ZoneFiltering = PetJournalEnhanced:GetModule("ZoneFiltering")
 local L =  LibStub("AceLocale-3.0"):GetLocale("PetJournalEnhanced")
 
 -- luacheck: globals UIDropDownMenu_Initialize UIDropDownMenu_CreateInfo UIDropDownMenu_AddButton UIDROPDOWNMENU_MENU_VALUE
@@ -465,59 +465,59 @@ local function CreateDropdownMenu(self, level)
                 UIDropDownMenu_AddButton(info, level)
             end
 
-        elseif UIDROPDOWNMENU_MENU_VALUE == 3 then --zone filter
-            local info = UIDropDownMenu_CreateInfo()
-            local zoneTree = ZoneFiltering:GetZoneGroupMapping()
-            info.hasArrow = false
-            info.isNotRadio = true
-            info.notCheckable = true
-            info.keepShownOnClick = true
-            info.text = CHECK_ALL
-            info.func = function()
-                ZoneFiltering:SetAllFiltered(true)
-                Sorting.filtering.unknownZone = true
-                Sorting:UpdatePets()
-                UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
-            end
-            UIDropDownMenu_AddButton(info, level)
+        -- elseif UIDROPDOWNMENU_MENU_VALUE == 3 then --zone filter
+        --     local info = UIDropDownMenu_CreateInfo()
+        --     local zoneTree = ZoneFiltering:GetZoneGroupMapping()
+        --     info.hasArrow = false
+        --     info.isNotRadio = true
+        --     info.notCheckable = true
+        --     info.keepShownOnClick = true
+        --     info.text = CHECK_ALL
+        --     info.func = function()
+        --         ZoneFiltering:SetAllFiltered(true)
+        --         Sorting.filtering.unknownZone = true
+        --         Sorting:UpdatePets()
+        --         UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
+        --     end
+        --     UIDropDownMenu_AddButton(info, level)
 
-            info.text = UNCHECK_ALL
-            info.func = function()
-                ZoneFiltering:SetAllFiltered(false)
-                Sorting.filtering.unknownZone = false
-                Sorting:UpdatePets()
-                UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
-            end
-            UIDropDownMenu_AddButton(info, level)
+        --     info.text = UNCHECK_ALL
+        --     info.func = function()
+        --         ZoneFiltering:SetAllFiltered(false)
+        --         Sorting.filtering.unknownZone = false
+        --         Sorting:UpdatePets()
+        --         UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
+        --     end
+        --     UIDropDownMenu_AddButton(info, level)
 
-            info.notCheckable = false
-            info.keepShownOnClick = true
-            info.checked = false
-            info.isNotRadio = true
-            info.text = FILTER_UNKNOWN_ZONE
-            info.func = function(_, _, _, value)
-                Sorting.filtering.unknownZone = not Sorting.filtering.unknownZone
-                UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
-                Sorting:UpdatePets()
-            end
-            info.checked = function()
-                return Sorting.filtering.unknownZone
-            end
-            UIDropDownMenu_AddButton(info, level)
+        --     info.notCheckable = false
+        --     info.keepShownOnClick = true
+        --     info.checked = false
+        --     info.isNotRadio = true
+        --     info.text = FILTER_UNKNOWN_ZONE
+        --     info.func = function(_, _, _, value)
+        --         Sorting.filtering.unknownZone = not Sorting.filtering.unknownZone
+        --         UIDropDownMenu_Refresh(PetJournalFilterDropDown, 1, 2)
+        --         Sorting:UpdatePets()
+        --     end
+        --     info.checked = function()
+        --         return Sorting.filtering.unknownZone
+        --     end
+        --     UIDropDownMenu_AddButton(info, level)
 
-            local ZoneGroupMap = ZoneFiltering:GetZoneGroupMapping()
-            for i=1,ZoneFiltering:GetNumZoneGroups() do
-                info.hasArrow = true
-                info.notCheckable = true
-                info.keepShownOnClick = true
-                info.checked = false
-                info.isNotRadio = true
-                info.text = ZoneFiltering:GetZoneGroupNames(i)
-                info.value = i
-                info.func = nil
-                info.checked = nil
-                UIDropDownMenu_AddButton(info, level)
-            end
+        --     local ZoneGroupMap = ZoneFiltering:GetZoneGroupMapping()
+        --     for i=1,ZoneFiltering:GetNumZoneGroups() do
+        --         info.hasArrow = true
+        --         info.notCheckable = true
+        --         info.keepShownOnClick = true
+        --         info.checked = false
+        --         info.isNotRadio = true
+        --         info.text = ZoneFiltering:GetZoneGroupNames(i)
+        --         info.value = i
+        --         info.func = nil
+        --         info.checked = nil
+        --         UIDropDownMenu_AddButton(info, level)
+        --     end
 
         elseif UIDROPDOWNMENU_MENU_VALUE == 4 then --pet specialization
             local info = UIDropDownMenu_CreateInfo()
@@ -856,7 +856,7 @@ function DropDown:OnInitialize()
     UIDropDownMenu_Initialize(self.menuFrame, CreateDropdownMenu , "MENU")
     UIDropDownMenu_Initialize(self.petOptionsMenu, PetOptionsMenu_Init , "MENU")
     self.filterButton:SetScript("OnClick",function()
-        PlaySound("igMainMenuOptionCheckBoxOn")
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
         ToggleDropDownMenu(1, nil, self.menuFrame, "PetJournalEnhancedFilterButton", 74, 15)
     end)
 end
