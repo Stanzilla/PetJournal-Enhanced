@@ -47,4 +47,4 @@
 <li>Breed</li>
 <li>Level Range (1,2-10,11-20,21-24,25)</li>
 </ul>
-<p>Please report any lua errors, inconsistent or weird behavior by using the <a href="https://www.curseforge.com/wow/addons/pet-journal-enhanced/issues">ticketing system</a> on the projects site.</p>
+<p>Please report any lua errors, inconsistent or weird behavior by using the <a href="https://github.com/Stanzilla/PetJournal-Enhanced/issues">ticketing system</a> on the projects site.</p>
