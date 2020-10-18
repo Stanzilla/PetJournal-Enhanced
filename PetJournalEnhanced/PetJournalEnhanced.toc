@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 90001
 ## Title: PetJournal Enhanced
 ## Notes: Enhances the Pet Journal with various functions and filters.
 ## Author: nullberri
